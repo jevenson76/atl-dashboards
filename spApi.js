@@ -23,8 +23,8 @@
         fallbackSiteUrl: 'https://chamberlaingroup.sharepoint.com/sites/PrincipalGTMStrategy-InternalUseOnly-ATLIntegrationProject',
 
         // Power Automate HTTP Trigger URL for external hosting (bypasses CORS)
-        // SET THIS AFTER CREATING THE FLOW - get URL from Flow trigger
-        flowProxyUrl: null,  // e.g., 'https://prod-XX.westus.logic.azure.com:443/workflows/...'
+        // ATL - Dashboard API flow - returns aggregated dashboard data
+        flowProxyUrl: 'https://defaulte4cc342547114cc4adc60006d217b2.ff.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/4a5171c0b1cb4a35a876eb597f766007/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=4LgmfwuA3vX6SkPP_iK2Bb6geadT0eTArUnmU7BEumQ',
 
         // Auto-detect if running externally (not on SharePoint)
         // When true and flowProxyUrl is set, uses Flow proxy for data
@@ -176,55 +176,98 @@
 
     /**
      * Call the Power Automate HTTP trigger to get list data
+     * (Legacy function - use getDashboardData for aggregated data)
      *
      * @param {string} listName - SharePoint list name
      * @param {Object} options - Query options (select, filter, top, orderby)
      * @returns {Promise<Array>} Array of list items
      */
     function callFlowProxy(listName, options) {
+        // The Dashboard API returns aggregated data, not raw list items
+        // For raw list items, we'd need a different flow
+        // This function now returns the aggregated data and lets callers handle it
+        return getDashboardData().then(function(data) {
+            log('info', 'Flow returned aggregated dashboard data with ' + data.kpis.total + ' total tasks');
+            // Return empty array but callers should use getDashboardData() directly
+            return [];
+        });
+    }
+
+    /**
+     * Cached dashboard data to avoid repeated Flow calls
+     */
+    var dashboardDataCache = {
+        data: null,
+        timestamp: null,
+        maxAge: 60000  // Cache for 60 seconds
+    };
+
+    /**
+     * Get aggregated dashboard data from the ATL Dashboard API flow
+     * Returns KPIs, phases, pillars, owners, milestones, etc.
+     *
+     * @returns {Promise<Object>} Aggregated dashboard data
+     */
+    function getDashboardData() {
+        // Return cached data if fresh
+        if (dashboardDataCache.data && dashboardDataCache.timestamp) {
+            var age = Date.now() - dashboardDataCache.timestamp;
+            if (age < dashboardDataCache.maxAge) {
+                log('debug', 'Returning cached dashboard data (' + Math.round(age/1000) + 's old)');
+                return Promise.resolve(dashboardDataCache.data);
+            }
+        }
+
         if (!CONFIG.flowProxyUrl) {
             return Promise.reject(new Error('Flow proxy URL not configured. Set spApi.config.flowProxyUrl'));
         }
 
-        options = options || {};
-
-        // Build request body for the Flow
-        var requestBody = {
-            listName: listName,
-            select: options.select || null,
-            filter: options.filter || null,
-            top: options.top || CONFIG.defaultTop,
-            orderby: options.orderby || null
-        };
-
-        log('debug', 'Calling Flow proxy for: ' + listName, requestBody);
+        log('info', 'Fetching dashboard data from Flow...');
 
         return fetch(CONFIG.flowProxyUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(requestBody)
+            body: JSON.stringify({ listName: 'ATL_Project_Plan.v21' })
         })
         .then(function(response) {
             if (!response.ok) {
                 return response.text().then(function(text) {
-                    throw new Error('Flow proxy error ' + response.status + ': ' + text.slice(0, 200));
+                    throw new Error('Dashboard API error ' + response.status + ': ' + text.slice(0, 200));
                 });
             }
             return response.json();
         })
         .then(function(data) {
-            // Flow returns { items: [...], count: N }
-            var items = data.items || data.value || [];
-            log('info', 'Flow proxy returned ' + items.length + ' items from ' + listName);
-            return items;
+            // Cache the response
+            dashboardDataCache.data = data;
+            dashboardDataCache.timestamp = Date.now();
+
+            log('info', 'Dashboard data loaded: ' + data.kpis.total + ' tasks, ' + data.phases.length + ' phases');
+            state.lastFetch = { url: 'Dashboard API', time: new Date() };
+            state.lastError = null;
+            return data;
         })
         .catch(function(error) {
-            log('error', 'Flow proxy failed: ' + error.message);
+            log('error', 'Dashboard API failed: ' + error.message);
             state.lastError = { url: CONFIG.flowProxyUrl, error: error.message, time: new Date() };
+            // Auto-show debug panel on error
+            var debugEl = document.getElementById('sp-api-debug');
+            if (debugEl) {
+                debugEl.classList.add('visible');
+            }
             throw error;
         });
+    }
+
+    /**
+     * Clear the dashboard data cache (force refresh on next call)
+     */
+    function clearDashboardCache() {
+        dashboardDataCache.data = null;
+        dashboardDataCache.timestamp = null;
+        log('info', 'Dashboard cache cleared');
     }
 
     // ============================================================
@@ -758,7 +801,11 @@
 
         // Flow proxy configuration
         setFlowProxyUrl: setFlowProxyUrl,
-        shouldUseFlowProxy: shouldUseFlowProxy
+        shouldUseFlowProxy: shouldUseFlowProxy,
+
+        // Dashboard API (aggregated data from Flow)
+        getDashboardData: getDashboardData,
+        clearDashboardCache: clearDashboardCache
     };
 
     // Auto-initialize on DOM ready

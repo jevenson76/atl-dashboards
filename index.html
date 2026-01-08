@@ -1189,6 +1189,73 @@
         }
 
         function loadFromSharePoint() {
+            // Use Dashboard API when running externally (GitHub Pages)
+            if (spApi.shouldUseFlowProxy()) {
+                return spApi.getDashboardData().then(function(apiData) {
+                    // Map Dashboard API response to expected format
+                    var statusCounts = {
+                        complete: 0,
+                        onTrack: apiData.kpis.green || 0,
+                        atRisk: apiData.kpis.yellow || 0,
+                        blocked: apiData.kpis.critical || 0,
+                        notStarted: apiData.kpis.total - (apiData.kpis.green + apiData.kpis.yellow + apiData.kpis.critical)
+                    };
+
+                    // Map phases from API
+                    var phases = apiData.phases.map(function(p, idx) {
+                        return {
+                            num: idx + 1,
+                            name: p.name.replace('Phase ' + (idx + 1) + ': ', ''),
+                            pct: p.progress || 0,
+                            active: idx === 0 && p.progress < 100
+                        };
+                    });
+
+                    // Mark first incomplete phase as active
+                    var foundActive = false;
+                    phases.forEach(function(p) {
+                        if (!foundActive && p.pct < 100) {
+                            p.active = true;
+                            foundActive = true;
+                        } else if (p.pct < 100) {
+                            p.active = false;
+                        }
+                    });
+
+                    // Map pillars from API
+                    var pillars = apiData.pillars.map(function(p) {
+                        return {
+                            name: p.name,
+                            icon: getPillarIcon(p.name),
+                            tasks: p.tasks,
+                            revenue: p.revenue ? '$' + (p.revenue / 1000000).toFixed(1) + 'M' : null,
+                            color: getPillarColor(p.name)
+                        };
+                    });
+
+                    // Map milestones from API
+                    var milestones = apiData.milestones.map(function(m) {
+                        return {
+                            task: m.num,
+                            title: m.title,
+                            date: formatMilestoneDate(m.date),
+                            owner: m.owner,
+                            status: m.status.toLowerCase()
+                        };
+                    });
+
+                    return {
+                        statusCounts: statusCounts,
+                        phases: phases,
+                        pillars: pillars,
+                        milestones: milestones,
+                        totalTasks: apiData.kpis.total,
+                        lastModified: new Date(apiData.timestamp)
+                    };
+                });
+            }
+
+            // Direct SharePoint REST API (when running on SharePoint)
             return spApi.getTasks({
                 select: 'Id,Title,Phase,Status,Priority,DueDate,Workstream',
                 top: 500
@@ -1262,6 +1329,36 @@
                     lastModified: new Date()
                 };
             });
+        }
+
+        // Helper functions for mapping API data
+        function getPillarIcon(name) {
+            var icons = {
+                'Product Expansion': 'box',
+                'CG GTM Synergy': 'handshake',
+                'Incremental Pipeline': 'chart-line',
+                'Lost Customer Conversion': 'users',
+                'Enablement': 'tools'
+            };
+            return icons[name] || 'folder';
+        }
+
+        function getPillarColor(name) {
+            var colors = {
+                'Product Expansion': '#3b82f6',
+                'CG GTM Synergy': '#8b5cf6',
+                'Incremental Pipeline': '#10b981',
+                'Lost Customer Conversion': '#f59e0b',
+                'Enablement': '#6b7280'
+            };
+            return colors[name] || '#6b7280';
+        }
+
+        function formatMilestoneDate(dateStr) {
+            if (!dateStr) return 'TBD';
+            var d = new Date(dateStr);
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return months[d.getMonth()] + ' ' + d.getDate();
         }
 
         function renderDashboard() {
