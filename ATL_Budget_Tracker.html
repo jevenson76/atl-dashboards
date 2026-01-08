@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATL Integration | Budget Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Brand Colors */
+            --cg-navy: #003087;
+            --cg-navy-dark: #00256b;
+            --arrow-blue: #4A90D9;
+            --arrow-blue-light: #6BA3E0;
+            --arrow-red: #E94E4E;
+
+            /* Backgrounds */
+            --bg-primary: #f8f9fb;
+            --bg-white: #ffffff;
+
+            /* Borders */
+            --border: #e5e7eb;
+            --border-light: #eef0f3;
+
+            /* Text */
+            --text-primary: #1a1f36;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+
+            /* Status Colors */
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #fbbf24;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+
+            /* Design Tokens */
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-xl: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+
+            /* Typography */
+            --font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 16px; scroll-behavior: smooth; }
+        body {
+            font-family: var(--font);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Navigation */
+        nav {
+            background: linear-gradient(135deg, var(--cg-navy) 0%, var(--cg-navy-dark) 100%);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-logos {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-logos img {
+            height: 24px;
+            filter: brightness(0) invert(1);
+        }
+
+        .nav-divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .nav-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link {
+            padding: 0.5rem 1rem;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-link.active {
+            color: white;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .revenue-hero {
+            background: linear-gradient(135deg, var(--cg-navy) 0%, var(--cg-navy-dark) 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            color: white;
+            margin-bottom: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .revenue-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: radial-gradient(ellipse at 80% 20%, rgba(74, 144, 217, 0.15) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) { .revenue-hero { grid-template-columns: 1fr; } }
+
+        .revenue-target {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .revenue-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .revenue-value {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1;
+            font-family: var(--font-mono);
+            letter-spacing: -0.02em;
+        }
+
+        .revenue-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        .revenue-progress {
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 0.75rem;
+        }
+
+        .progress-current {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            letter-spacing: -0.02em;
+        }
+
+        .progress-percent {
+            font-size: 1.25rem;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .progress-track {
+            height: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), #34d399);
+            border-radius: 10px;
+            transition: width 1s ease;
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .budget-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+
+        .budget-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeInUp 0.5s ease-out both;
+        }
+
+        .budget-card:nth-child(1) { animation-delay: 0.1s; }
+        .budget-card:nth-child(2) { animation-delay: 0.2s; }
+        .budget-card:nth-child(3) { animation-delay: 0.3s; }
+        .budget-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .budget-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--arrow-blue-light);
+        }
+
+        .budget-card-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .budget-card-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .budget-card-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .badge-on-track { background: var(--success-light); color: var(--success); }
+        .badge-at-risk { background: var(--warning-light); color: var(--warning); }
+        .badge-over { background: var(--danger-light); color: var(--danger); }
+
+        .budget-card-body {
+            padding: 1.25rem;
+        }
+
+        .pillar-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 0;
+            border-bottom: 1px solid var(--border-light);
+            transition: background 0.2s ease;
+        }
+
+        .pillar-item:last-child { border-bottom: none; }
+
+        .pillar-item:hover {
+            background: var(--bg-primary);
+            margin: 0 -0.5rem;
+            padding: 0.875rem 0.5rem;
+            border-radius: var(--radius-md);
+        }
+
+        .pillar-color {
+            width: 4px;
+            height: 44px;
+            border-radius: 2px;
+        }
+
+        .pillar-info { flex: 1; }
+
+        .pillar-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .pillar-target {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .pillar-value { text-align: right; }
+
+        .pillar-current {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--cg-navy);
+            font-family: var(--font-mono);
+        }
+
+        .pillar-percent {
+            font-size: 0.75rem;
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .quarter-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+        }
+
+        .quarter-item {
+            text-align: center;
+            padding: 1rem 0.75rem;
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            transition: all 0.2s ease;
+        }
+
+        .quarter-item:hover {
+            background: var(--border-light);
+            transform: translateY(-2px);
+        }
+
+        .quarter-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .quarter-value {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--cg-navy);
+            font-family: var(--font-mono);
+        }
+
+        .quarter-status {
+            font-size: 0.7rem;
+            margin-top: 0.35rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .quarter-status.achieved { color: var(--success); }
+        .quarter-status.projected { color: var(--arrow-blue); }
+        .quarter-status.planned { color: var(--text-muted); }
+
+        .expense-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 0;
+            border-bottom: 1px solid var(--border-light);
+            transition: background 0.2s ease;
+        }
+
+        .expense-row:last-child { border-bottom: none; }
+
+        .expense-row:hover {
+            background: var(--bg-primary);
+            margin: 0 -0.5rem;
+            padding: 0.875rem 0.5rem;
+            border-radius: var(--radius-md);
+        }
+
+        .expense-category { flex: 1; }
+
+        .expense-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .expense-bar { flex: 2; }
+
+        .expense-track {
+            height: 8px;
+            background: var(--border-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .expense-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .expense-values {
+            width: 120px;
+            text-align: right;
+        }
+
+        .expense-spent {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .expense-budget {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .kpi-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-light);
+            transition: background 0.2s ease;
+        }
+
+        .kpi-row:last-child { border-bottom: none; }
+
+        .kpi-row:hover {
+            background: var(--bg-primary);
+            margin: 0 -0.5rem;
+            padding: 0.75rem 0.5rem;
+            border-radius: var(--radius-md);
+        }
+
+        .kpi-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .kpi-value {
+            font-size: 0.95rem;
+            font-weight: 800;
+            font-family: var(--font-mono);
+        }
+
+        .kpi-value.positive { color: var(--success); }
+        .kpi-value.negative { color: var(--danger); }
+
+        /* Footer */
+        footer {
+            padding: 1rem 2rem;
+            background: var(--bg-white);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .footer-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-status .live-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .budget-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 0 1rem;
+            }
+
+            .nav-links {
+                gap: 0.25rem;
+            }
+
+            .nav-link {
+                padding: 0.35rem 0.65rem;
+                font-size: 0.75rem;
+            }
+
+            .main-content {
+                padding: 1.5rem 1rem;
+            }
+
+            .revenue-hero {
+                grid-template-columns: 1fr;
+                padding: 1.5rem;
+            }
+
+            .revenue-value {
+                font-size: 2.5rem;
+            }
+
+            .progress-current {
+                font-size: 1.5rem;
+            }
+
+            .quarter-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .budget-grid {
+                grid-template-columns: 1fr;
+            }
+
+            footer {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+        }
+
+        /* === TEXT OVERFLOW PROTECTION === */
+
+        /* Prevent horizontal overflow on body/containers */
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
+        /* Single-line text truncation */
+        .nav-title,
+        .pillar-name,
+        .criteria-label,
+        .metric-label,
+        .milestone-text,
+        .product-name,
+        .kpi-label,
+        .task-title,
+        .gantt-task-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Multi-line text truncation */
+        .pillar-how,
+        .task-description,
+        .description-text {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-clamp: 2;
+        }
+
+        /* Prevent card/container overflow */
+        .card,
+        .sidebar-card,
+        .gantt-row,
+        .task-row {
+            overflow: hidden;
+            max-width: 100%;
+        }
+
+        /* Word break for long values */
+        .value,
+        .metric-value,
+        .stat-value {
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-brand">
+            <div class="nav-logos">
+                <img src="/sites/PrincipalGTMStrategy-InternalUseOnly/Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/Site/Assets/transparent/ArrowTruLine.png" alt="Arrow Tru-Line">
+                <div class="nav-divider"></div>
+                <img src="/sites/PrincipalGTMStrategy-InternalUseOnly/Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/Site/Assets/transparent/Chamberlain-logo-blue.png" alt="Chamberlain Group">
+            </div>
+            <span class="nav-title">2026 Integration Plan</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Dashboard</a>
+            <a href="ATL_Project_Gantt.html" class="nav-link">Gantt</a>
+            <a href="ATL_Status_Hub.html" class="nav-link">Status</a>
+            <a href="ATL_My_Tasks.html" class="nav-link">My Tasks</a>
+            <a href="ATL_Budget_Tracker.html" class="nav-link active">Budget</a>
+            <a href="ATL_Team_Workload.html" class="nav-link">Teams</a>
+            <a href="ATL_Reports.html" class="nav-link">Reports</a>
+            <a href="ATL_Admin.html" class="nav-link">Admin</a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <h1>Budget & Revenue Tracker</h1>
+            <p>2026 revenue targets, budget allocation, and financial progress</p>
+        </div>
+
+        <div class="revenue-hero">
+            <div class="revenue-target">
+                <div class="revenue-label">2026 Revenue Target</div>
+                <div class="revenue-value">$190M</div>
+                <div class="revenue-subtitle">Arrow Tru-Line Integration</div>
+            </div>
+            <div class="revenue-progress">
+                <div class="progress-header">
+                    <div class="progress-current">$32.5M</div>
+                    <div class="progress-percent">17.1% of target</div>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" style="width: 17.1%;"></div>
+                </div>
+                <div class="progress-labels">
+                    <span>$0</span>
+                    <span>$47.5M (Q1)</span>
+                    <span>$95M (Q2)</span>
+                    <span>$142.5M (Q3)</span>
+                    <span>$190M</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="budget-grid" id="budgetGrid"></div>
+    </div>
+
+    <script>
+        var budgetData = {
+            pillars: [
+                { name: 'Product Expansion', target: 65, current: 12.5, color: 'var(--cg-navy)', percent: 19 },
+                { name: 'CG GTM Synergy', target: 55, current: 8.2, color: 'var(--arrow-blue)', percent: 15 },
+                { name: 'Incremental Pipeline', target: 45, current: 7.8, color: 'var(--success)', percent: 17 },
+                { name: 'Lost Customer Conversion', target: 25, current: 4.0, color: 'var(--warning)', percent: 16 }
+            ],
+            quarters: [
+                { label: 'Q1 2026', value: 47.5, status: 'projected' },
+                { label: 'Q2 2026', value: 47.5, status: 'planned' },
+                { label: 'Q3 2026', value: 47.5, status: 'planned' },
+                { label: 'Q4 2026', value: 47.5, status: 'planned' }
+            ],
+            expenses: [
+                { name: 'Integration Resources', spent: 245000, budget: 500000, color: 'var(--cg-navy)' },
+                { name: 'Technology & Systems', spent: 180000, budget: 350000, color: 'var(--arrow-blue)' },
+                { name: 'Training & Development', spent: 45000, budget: 150000, color: 'var(--success)' },
+                { name: 'Marketing & Sales', spent: 120000, budget: 200000, color: 'var(--warning)' },
+                { name: 'Contingency', spent: 25000, budget: 100000, color: 'var(--text-muted)' }
+            ],
+            kpis: [
+                { label: 'Revenue per Employee', value: '$285K', positive: true },
+                { label: 'Gross Margin', value: '34.2%', positive: true },
+                { label: 'Customer Acquisition Cost', value: '$12.5K', positive: false },
+                { label: 'Pipeline Coverage', value: '3.2x', positive: true },
+                { label: 'Win Rate', value: '28%', positive: true },
+                { label: 'Average Deal Size', value: '$45K', positive: true }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderBudgetCards();
+        });
+
+        function formatCurrency(value, millions) {
+            if (millions) {
+                return '$' + value.toFixed(1) + 'M';
+            }
+            return '$' + value.toLocaleString();
+        }
+
+        function renderBudgetCards() {
+            var grid = document.getElementById('budgetGrid');
+
+            // Revenue by Pillar Card
+            var pillarCard = document.createElement('div');
+            pillarCard.className = 'budget-card';
+
+            var pillarHeader = document.createElement('div');
+            pillarHeader.className = 'budget-card-header';
+            var pillarTitle = document.createElement('span');
+            pillarTitle.className = 'budget-card-title';
+            pillarTitle.textContent = 'Revenue by Pillar';
+            var pillarBadge = document.createElement('span');
+            pillarBadge.className = 'budget-card-badge badge-on-track';
+            pillarBadge.textContent = 'On Track';
+            pillarHeader.appendChild(pillarTitle);
+            pillarHeader.appendChild(pillarBadge);
+
+            var pillarBody = document.createElement('div');
+            pillarBody.className = 'budget-card-body';
+
+            budgetData.pillars.forEach(function(pillar) {
+                var item = document.createElement('div');
+                item.className = 'pillar-item';
+
+                var colorBar = document.createElement('div');
+                colorBar.className = 'pillar-color';
+                colorBar.style.background = pillar.color;
+
+                var info = document.createElement('div');
+                info.className = 'pillar-info';
+                var name = document.createElement('div');
+                name.className = 'pillar-name';
+                name.textContent = pillar.name;
+                var target = document.createElement('div');
+                target.className = 'pillar-target';
+                target.textContent = 'Target: ' + formatCurrency(pillar.target, true);
+                info.appendChild(name);
+                info.appendChild(target);
+
+                var value = document.createElement('div');
+                value.className = 'pillar-value';
+                var current = document.createElement('div');
+                current.className = 'pillar-current';
+                current.textContent = formatCurrency(pillar.current, true);
+                var percent = document.createElement('div');
+                percent.className = 'pillar-percent';
+                percent.textContent = pillar.percent + '% of target';
+                value.appendChild(current);
+                value.appendChild(percent);
+
+                item.appendChild(colorBar);
+                item.appendChild(info);
+                item.appendChild(value);
+                pillarBody.appendChild(item);
+            });
+
+            pillarCard.appendChild(pillarHeader);
+            pillarCard.appendChild(pillarBody);
+            grid.appendChild(pillarCard);
+
+            // Quarterly Targets Card
+            var quarterCard = document.createElement('div');
+            quarterCard.className = 'budget-card';
+
+            var quarterHeader = document.createElement('div');
+            quarterHeader.className = 'budget-card-header';
+            var quarterTitle = document.createElement('span');
+            quarterTitle.className = 'budget-card-title';
+            quarterTitle.textContent = 'Quarterly Targets';
+            quarterHeader.appendChild(quarterTitle);
+
+            var quarterBody = document.createElement('div');
+            quarterBody.className = 'budget-card-body';
+            var quarterGrid = document.createElement('div');
+            quarterGrid.className = 'quarter-grid';
+
+            budgetData.quarters.forEach(function(q) {
+                var item = document.createElement('div');
+                item.className = 'quarter-item';
+
+                var label = document.createElement('div');
+                label.className = 'quarter-label';
+                label.textContent = q.label;
+
+                var value = document.createElement('div');
+                value.className = 'quarter-value';
+                value.textContent = formatCurrency(q.value, true);
+
+                var status = document.createElement('div');
+                status.className = 'quarter-status ' + q.status;
+                status.textContent = q.status.charAt(0).toUpperCase() + q.status.slice(1);
+
+                item.appendChild(label);
+                item.appendChild(value);
+                item.appendChild(status);
+                quarterGrid.appendChild(item);
+            });
+
+            quarterBody.appendChild(quarterGrid);
+            quarterCard.appendChild(quarterHeader);
+            quarterCard.appendChild(quarterBody);
+            grid.appendChild(quarterCard);
+
+            // Expense Tracking Card
+            var expenseCard = document.createElement('div');
+            expenseCard.className = 'budget-card';
+
+            var expenseHeader = document.createElement('div');
+            expenseHeader.className = 'budget-card-header';
+            var expenseTitle = document.createElement('span');
+            expenseTitle.className = 'budget-card-title';
+            expenseTitle.textContent = 'Expense Tracking';
+            var expenseBadge = document.createElement('span');
+            expenseBadge.className = 'budget-card-badge badge-on-track';
+            expenseBadge.textContent = '47% Used';
+            expenseHeader.appendChild(expenseTitle);
+            expenseHeader.appendChild(expenseBadge);
+
+            var expenseBody = document.createElement('div');
+            expenseBody.className = 'budget-card-body';
+
+            budgetData.expenses.forEach(function(expense) {
+                var row = document.createElement('div');
+                row.className = 'expense-row';
+
+                var category = document.createElement('div');
+                category.className = 'expense-category';
+                var name = document.createElement('div');
+                name.className = 'expense-name';
+                name.textContent = expense.name;
+                category.appendChild(name);
+
+                var bar = document.createElement('div');
+                bar.className = 'expense-bar';
+                var track = document.createElement('div');
+                track.className = 'expense-track';
+                var fill = document.createElement('div');
+                fill.className = 'expense-fill';
+                fill.style.width = (expense.spent / expense.budget * 100) + '%';
+                fill.style.background = expense.color;
+                track.appendChild(fill);
+                bar.appendChild(track);
+
+                var values = document.createElement('div');
+                values.className = 'expense-values';
+                var spent = document.createElement('div');
+                spent.className = 'expense-spent';
+                spent.textContent = formatCurrency(expense.spent);
+                var budget = document.createElement('div');
+                budget.className = 'expense-budget';
+                budget.textContent = 'of ' + formatCurrency(expense.budget);
+                values.appendChild(spent);
+                values.appendChild(budget);
+
+                row.appendChild(category);
+                row.appendChild(bar);
+                row.appendChild(values);
+                expenseBody.appendChild(row);
+            });
+
+            expenseCard.appendChild(expenseHeader);
+            expenseCard.appendChild(expenseBody);
+            grid.appendChild(expenseCard);
+
+            // Key Financial KPIs Card
+            var kpiCard = document.createElement('div');
+            kpiCard.className = 'budget-card';
+
+            var kpiHeader = document.createElement('div');
+            kpiHeader.className = 'budget-card-header';
+            var kpiTitle = document.createElement('span');
+            kpiTitle.className = 'budget-card-title';
+            kpiTitle.textContent = 'Key Financial Metrics';
+            kpiHeader.appendChild(kpiTitle);
+
+            var kpiBody = document.createElement('div');
+            kpiBody.className = 'budget-card-body';
+
+            budgetData.kpis.forEach(function(kpi) {
+                var row = document.createElement('div');
+                row.className = 'kpi-row';
+
+                var label = document.createElement('span');
+                label.className = 'kpi-label';
+                label.textContent = kpi.label;
+
+                var value = document.createElement('span');
+                value.className = 'kpi-value ' + (kpi.positive ? 'positive' : 'negative');
+                value.textContent = kpi.value;
+
+                row.appendChild(label);
+                row.appendChild(value);
+                kpiBody.appendChild(row);
+            });
+
+            kpiCard.appendChild(kpiHeader);
+            kpiCard.appendChild(kpiBody);
+            grid.appendChild(kpiCard);
+        }
+    </script>
+
+    <footer>
+        <div>Arrow Tru-Line Integration &bull; Budget & Revenue Tracker</div>
+        <div class="footer-status">
+            <span class="live-dot"></span>
+            <span>Live</span>
+        </div>
+    </footer>
+    <script src="spApi.js"></script>
+</body>
+</html>

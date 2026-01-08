@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATL Integration | Blocker Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cg-navy: #003087;
+            --cg-navy-dark: #00256b;
+            --cg-blue: #3b82f6;
+            --arrow-blue: #4A90D9;
+            --arrow-red: #E94E4E;
+            --bg-primary: #f9fafb;
+            --border: #e5e7eb;
+            --border-light: #eef0f3;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --gold: #fbbf24;
+            --font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font); background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+
+        nav { position: relative; z-index: 100; background: linear-gradient(135deg, var(--cg-navy) 0%, var(--cg-navy-dark) 100%); padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; height: 64px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .nav-brand { display: flex; align-items: center; gap: 1rem; }
+        .nav-logos { display: flex; align-items: center; gap: 0.75rem; }
+        .nav-logos img { height: 28px; filter: brightness(0) invert(1); }
+        .nav-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.4); }
+        .nav-title { font-size: 0.9rem; font-weight: 700; color: white; letter-spacing: 0.3px; }
+        .nav-links { display: flex; align-items: center; gap: 0.5rem; }
+        .nav-link { padding: 0.5rem 1rem; color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.85rem; font-weight: 600; border-radius: 6px; transition: all 0.2s ease; }
+        .nav-link:hover { color: white; background: rgba(255,255,255,0.12); transform: translateY(-1px); }
+        .nav-link.active { color: white; background: rgba(255,255,255,0.2); }
+
+        .main-content { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .page-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-start; background: white; padding: 1.5rem 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-bottom: 3px solid var(--cg-blue); }
+        .page-header h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--cg-navy); }
+        .page-header p { color: var(--text-secondary); font-size: 0.95rem; }
+
+        .alert-banner { background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%); color: white; padding: 1.5rem 2rem; border-radius: 12px; margin-bottom: 2rem; display: flex; align-items: center; gap: 1.5rem; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25); }
+        .alert-icon { font-size: 2.5rem; }
+        .alert-content h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .alert-content p { font-size: 0.95rem; opacity: 0.95; }
+        .alert-count { margin-left: auto; font-size: 3.5rem; font-weight: 800; opacity: 0.9; }
+
+        .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .summary-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-top: 4px solid var(--border); transition: all 0.2s ease; }
+        .summary-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.12); transform: translateY(-2px); }
+        .summary-card.critical { border-top-color: var(--danger); }
+        .summary-card.at-risk { border-top-color: var(--warning); }
+        .summary-card.dependency { border-top-color: var(--cg-blue); }
+        .summary-card.resolved { border-top-color: var(--success); }
+        .summary-label { font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem; }
+        .summary-value { font-size: 2.25rem; font-weight: 800; background: linear-gradient(135deg, var(--cg-navy), var(--cg-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .summary-trend { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem; }
+
+        .blocker-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; }
+        @media (max-width: 1024px) { .blocker-grid { grid-template-columns: 1fr; } }
+
+        .blocker-list { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden; border-bottom: 3px solid var(--cg-blue); }
+        .blocker-header { padding: 1.25rem 1.5rem; border-bottom: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%); }
+        .blocker-title { font-size: 1.1rem; font-weight: 700; color: var(--cg-navy); }
+        .blocker-filter { padding: 0.5rem 1rem; border: 2px solid var(--border); border-radius: 8px; font-size: 0.85rem; font-family: inherit; background: white; font-weight: 600; transition: all 0.2s ease; }
+        .blocker-filter:hover { border-color: var(--cg-blue); }
+        .blocker-filter:focus { outline: none; border-color: var(--cg-blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+
+        .blocker-item { padding: 1.5rem; border-bottom: 1px solid var(--border); transition: all 0.2s ease; }
+        .blocker-item:last-child { border-bottom: none; }
+        .blocker-item:hover { background: #f8fafc; box-shadow: inset 4px 0 0 var(--cg-blue); }
+
+        .blocker-item-header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+        .blocker-severity { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .severity-critical { background: var(--danger); }
+        .severity-high { background: var(--warning); }
+        .severity-medium { background: var(--cg-blue); }
+
+        .blocker-info { flex: 1; }
+        .blocker-task { font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--cg-navy); }
+        .blocker-id { font-size: 0.8rem; color: var(--cg-blue); font-weight: 600; }
+
+        .blocker-age { text-align: right; }
+        .blocker-days { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, var(--danger), #dc2626); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .blocker-days-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+
+        .blocker-description { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem; padding-left: 1.75rem; line-height: 1.6; }
+
+        .blocker-meta { display: flex; gap: 2rem; padding-left: 1.75rem; flex-wrap: wrap; }
+        .blocker-meta-item { font-size: 0.85rem; color: var(--text-secondary); }
+        .blocker-meta-item strong { color: var(--cg-navy); font-weight: 700; }
+
+        .blocker-actions { margin-top: 1rem; padding-left: 1.75rem; display: flex; gap: 0.75rem; }
+        .btn-sm { padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s ease; }
+        .btn-resolve { background: var(--success); color: white; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.25); }
+        .btn-resolve:hover { background: #0d9668; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3); }
+        .btn-escalate { background: var(--warning); color: white; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.25); }
+        .btn-escalate:hover { background: #d97706; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3); }
+        .btn-view { background: white; color: var(--cg-blue); border: 2px solid var(--cg-blue); }
+        .btn-view:hover { background: var(--cg-blue); color: white; transform: translateY(-1px); }
+
+        .sidebar { display: flex; flex-direction: column; gap: 2rem; }
+        .sidebar-card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 1.5rem; border-bottom: 3px solid var(--cg-blue); }
+        .sidebar-title { font-size: 1rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--cg-navy); }
+
+        .impact-item { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
+        .impact-item:last-child { border-bottom: none; }
+        .impact-count { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; background: var(--danger-light); color: var(--danger); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .impact-label { flex: 1; font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+
+        .owner-item { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
+        .owner-item:last-child { border-bottom: none; }
+        .owner-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--cg-navy), var(--cg-blue)); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+        .owner-name { flex: 1; font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+        .owner-count { font-size: 1rem; font-weight: 800; background: linear-gradient(135deg, var(--danger), #dc2626); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    
+
+        /* === SHAREPOINT COMPATIBILITY FIXES === */
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+        }
+        .nav-link.active {
+            color: white !important;
+            background: rgba(255,255,255,0.15) !important;
+        }
+
+    
+
+        /* === TEXT OVERFLOW PROTECTION === */
+
+        /* Prevent horizontal overflow on body/containers */
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
+        /* Single-line text truncation */
+        .nav-title,
+        .pillar-name,
+        .criteria-label,
+        .metric-label,
+        .milestone-text,
+        .product-name,
+        .kpi-label,
+        .task-title,
+        .gantt-task-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Multi-line text truncation */
+        .pillar-how,
+        .task-description,
+        .description-text {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-clamp: 2;
+        }
+
+        /* Prevent card/container overflow */
+        .card,
+        .sidebar-card,
+        .gantt-row,
+        .task-row {
+            overflow: hidden;
+            max-width: 100%;
+        }
+
+        /* Word break for long values */
+        .value,
+        .metric-value,
+        .stat-value {
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-brand">
+            <div class="nav-logos">
+                <img src="/sites/PrincipalGTMStrategy-InternalUseOnly/Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/Site/Assets/transparent/ArrowTruLine.png" alt="Arrow Tru-Line">
+                <div class="nav-divider"></div>
+                <img src="/sites/PrincipalGTMStrategy-InternalUseOnly/Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/Site/Assets/transparent/Chamberlain-logo-blue.png" alt="Chamberlain Group">
+            </div>
+            <span class="nav-title">2026 Integration Plan</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Dashboard</a>
+            <a href="ATL_Project_Gantt.html" class="nav-link">Gantt</a>
+            <a href="ATL_Status_Hub.html" class="nav-link active">Status</a>
+            <a href="ATL_My_Tasks.html" class="nav-link">My Tasks</a>
+            <a href="ATL_Team_Workload.html" class="nav-link">Teams</a>
+            <a href="ATL_Reports.html" class="nav-link">Reports</a>
+            <a href="ATL_Admin.html" class="nav-link">Admin</a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h1>Blocker Dashboard</h1>
+                <p>Active blockers, risks, and dependency issues requiring attention</p>
+            </div>
+        </div>
+
+        <div class="alert-banner" id="alertBanner"></div>
+
+        <div class="summary-cards" id="summaryCards"></div>
+
+        <div class="blocker-grid">
+            <div class="blocker-list">
+                <div class="blocker-header">
+                    <span class="blocker-title">Active Blockers</span>
+                    <select class="blocker-filter" id="blockerFilter">
+                        <option value="all">All Severity</option>
+                        <option value="critical">Critical Only</option>
+                        <option value="high">High & Critical</option>
+                    </select>
+                </div>
+                <div id="blockerItems"></div>
+            </div>
+
+            <div class="sidebar">
+                <div class="sidebar-card">
+                    <div class="sidebar-title">Impact by Phase</div>
+                    <div id="impactByPhase"></div>
+                </div>
+                <div class="sidebar-card">
+                    <div class="sidebar-title">Blockers by Owner</div>
+                    <div id="blockersByOwner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var blockerData = {
+            summary: [
+                { label: 'Critical Blockers', value: 3, trend: '+1 this week', type: 'critical' },
+                { label: 'At Risk Tasks', value: 12, trend: '-2 from last week', type: 'at-risk' },
+                { label: 'Dependency Issues', value: 5, trend: 'Unchanged', type: 'dependency' },
+                { label: 'Resolved (30d)', value: 8, trend: '+3 this week', type: 'resolved' }
+            ],
+            blockers: [
+                { id: 'T001', task: 'Budget & Financial Planning', severity: 'critical', days: 5, description: 'Waiting on Q4 actuals from finance team to finalize 2026 budget projections.', owner: 'Ken Sittman', phase: 'Phase 1', impact: '3 dependent tasks' },
+                { id: 'T014', task: 'OEM Partnership', severity: 'critical', days: 12, description: 'Contract negotiations stalled - legal review required for liability terms.', owner: 'Kedaresh Deshpande', phase: 'Phase 2', impact: '2 dependent tasks' },
+                { id: 'T009', task: 'CRU Index Pricing', severity: 'critical', days: 8, description: 'Missing historical pricing data from legacy system migration.', owner: 'Larry Jones', phase: 'Phase 2', impact: '4 dependent tasks' },
+                { id: 'T010', task: 'Inventory Accuracy', severity: 'high', days: 3, description: 'Discrepancy between ERP and warehouse management system counts.', owner: 'Ken Sittman', phase: 'Phase 2', impact: '1 dependent task' },
+                { id: 'T006', task: 'Lost Customer Win-Back', severity: 'high', days: 6, description: 'Need updated customer contact list from sales operations.', owner: 'Kedaresh Deshpande', phase: 'Phase 1', impact: '0 dependent tasks' },
+                { id: 'T022', task: 'Training Program Development', severity: 'medium', days: 2, description: 'Training content vendor contract pending procurement approval.', owner: 'Jennifer Binns', phase: 'Phase 3', impact: '2 dependent tasks' }
+            ],
+            impactByPhase: [
+                { phase: 'Phase 1', count: 2 },
+                { phase: 'Phase 2', count: 3 },
+                { phase: 'Phase 3', count: 1 },
+                { phase: 'Phase 4', count: 0 },
+                { phase: 'Phase 5', count: 0 }
+            ],
+            blockersByOwner: [
+                { name: 'Ken Sittman', initials: 'KS', count: 2 },
+                { name: 'Kedaresh Deshpande', initials: 'KD', count: 2 },
+                { name: 'Larry Jones', initials: 'LJ', count: 1 },
+                { name: 'Jennifer Binns', initials: 'JB', count: 1 }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderAlertBanner();
+            renderSummaryCards();
+            renderBlockers();
+            renderImpactByPhase();
+            renderBlockersByOwner();
+
+            document.getElementById('blockerFilter').addEventListener('change', renderBlockers);
+        });
+
+        function renderAlertBanner() {
+            var banner = document.getElementById('alertBanner');
+            var criticalCount = blockerData.blockers.filter(function(b) { return b.severity === 'critical'; }).length;
+
+            var icon = document.createElement('div');
+            icon.className = 'alert-icon';
+            icon.textContent = '⚠';
+
+            var content = document.createElement('div');
+            content.className = 'alert-content';
+            var title = document.createElement('h2');
+            title.textContent = 'Critical Blockers Require Attention';
+            var desc = document.createElement('p');
+            desc.textContent = 'These issues are blocking critical path tasks and need immediate resolution.';
+            content.appendChild(title);
+            content.appendChild(desc);
+
+            var count = document.createElement('div');
+            count.className = 'alert-count';
+            count.textContent = criticalCount;
+
+            banner.appendChild(icon);
+            banner.appendChild(content);
+            banner.appendChild(count);
+        }
+
+        function renderSummaryCards() {
+            var container = document.getElementById('summaryCards');
+            blockerData.summary.forEach(function(item) {
+                var card = document.createElement('div');
+                card.className = 'summary-card ' + item.type;
+
+                var label = document.createElement('div');
+                label.className = 'summary-label';
+                label.textContent = item.label;
+
+                var value = document.createElement('div');
+                value.className = 'summary-value';
+                value.textContent = item.value;
+
+                var trend = document.createElement('div');
+                trend.className = 'summary-trend';
+                trend.textContent = item.trend;
+
+                card.appendChild(label);
+                card.appendChild(value);
+                card.appendChild(trend);
+                container.appendChild(card);
+            });
+        }
+
+        function renderBlockers() {
+            var container = document.getElementById('blockerItems');
+            var filter = document.getElementById('blockerFilter').value;
+
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+
+            var filtered = blockerData.blockers.filter(function(b) {
+                if (filter === 'all') return true;
+                if (filter === 'critical') return b.severity === 'critical';
+                if (filter === 'high') return b.severity === 'critical' || b.severity === 'high';
+                return true;
+            });
+
+            filtered.forEach(function(blocker) {
+                var item = document.createElement('div');
+                item.className = 'blocker-item';
+
+                var header = document.createElement('div');
+                header.className = 'blocker-item-header';
+
+                var severity = document.createElement('div');
+                severity.className = 'blocker-severity severity-' + blocker.severity;
+
+                var info = document.createElement('div');
+                info.className = 'blocker-info';
+                var task = document.createElement('div');
+                task.className = 'blocker-task';
+                task.textContent = blocker.task;
+                var id = document.createElement('div');
+                id.className = 'blocker-id';
+                id.textContent = blocker.id + ' • ' + blocker.phase;
+                info.appendChild(task);
+                info.appendChild(id);
+
+                var age = document.createElement('div');
+                age.className = 'blocker-age';
+                var days = document.createElement('div');
+                days.className = 'blocker-days';
+                days.textContent = blocker.days;
+                var daysLabel = document.createElement('div');
+                daysLabel.className = 'blocker-days-label';
+                daysLabel.textContent = 'days blocked';
+                age.appendChild(days);
+                age.appendChild(daysLabel);
+
+                header.appendChild(severity);
+                header.appendChild(info);
+                header.appendChild(age);
+
+                var description = document.createElement('div');
+                description.className = 'blocker-description';
+                description.textContent = blocker.description;
+
+                var meta = document.createElement('div');
+                meta.className = 'blocker-meta';
+
+                var ownerMeta = document.createElement('div');
+                ownerMeta.className = 'blocker-meta-item';
+                var ownerLabel = document.createElement('strong');
+                ownerLabel.textContent = 'Owner: ';
+                ownerMeta.appendChild(ownerLabel);
+                ownerMeta.appendChild(document.createTextNode(blocker.owner));
+
+                var impactMeta = document.createElement('div');
+                impactMeta.className = 'blocker-meta-item';
+                var impactLabel = document.createElement('strong');
+                impactLabel.textContent = 'Impact: ';
+                impactMeta.appendChild(impactLabel);
+                impactMeta.appendChild(document.createTextNode(blocker.impact));
+
+                meta.appendChild(ownerMeta);
+                meta.appendChild(impactMeta);
+
+                var actions = document.createElement('div');
+                actions.className = 'blocker-actions';
+
+                var resolveBtn = document.createElement('button');
+                resolveBtn.className = 'btn-sm btn-resolve';
+                resolveBtn.textContent = 'Mark Resolved';
+
+                var escalateBtn = document.createElement('button');
+                escalateBtn.className = 'btn-sm btn-escalate';
+                escalateBtn.textContent = 'Escalate';
+
+                var viewBtn = document.createElement('button');
+                viewBtn.className = 'btn-sm btn-view';
+                viewBtn.textContent = 'View Details';
+
+                actions.appendChild(resolveBtn);
+                actions.appendChild(escalateBtn);
+                actions.appendChild(viewBtn);
+
+                item.appendChild(header);
+                item.appendChild(description);
+                item.appendChild(meta);
+                item.appendChild(actions);
+                container.appendChild(item);
+            });
+        }
+
+        function renderImpactByPhase() {
+            var container = document.getElementById('impactByPhase');
+            blockerData.impactByPhase.forEach(function(item) {
+                var div = document.createElement('div');
+                div.className = 'impact-item';
+
+                var count = document.createElement('div');
+                count.className = 'impact-count';
+                count.textContent = item.count;
+                if (item.count === 0) {
+                    count.style.background = 'var(--success-light)';
+                    count.style.color = 'var(--success)';
+                }
+
+                var label = document.createElement('div');
+                label.className = 'impact-label';
+                label.textContent = item.phase;
+
+                div.appendChild(count);
+                div.appendChild(label);
+                container.appendChild(div);
+            });
+        }
+
+        function renderBlockersByOwner() {
+            var container = document.getElementById('blockersByOwner');
+            blockerData.blockersByOwner.forEach(function(owner) {
+                var div = document.createElement('div');
+                div.className = 'owner-item';
+
+                var avatar = document.createElement('div');
+                avatar.className = 'owner-avatar';
+                avatar.textContent = owner.initials;
+
+                var name = document.createElement('div');
+                name.className = 'owner-name';
+                name.textContent = owner.name;
+
+                var count = document.createElement('div');
+                count.className = 'owner-count';
+                count.textContent = owner.count;
+
+                div.appendChild(avatar);
+                div.appendChild(name);
+                div.appendChild(count);
+                container.appendChild(div);
+            });
+        }
+    </script>
+    <script src="spApi.js"></script>
+</body>
+</html>

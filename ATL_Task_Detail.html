@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATL Integration | Task Update</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cg-navy: #003087;
+            --cg-blue: #3b82f6;
+            --cg-green: #10b981;
+            --cg-red: #ef4444;
+            --cg-gold: #fbbf24;
+            --bg-primary: #f9fafb;
+            --bg-white: #ffffff;
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-muted: #6b7280;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #fbbf24;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 16px; }
+        body {
+            font-family: var(--font);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        /* Navigation */
+        nav {
+            position: relative;
+            z-index: 100;
+            background: linear-gradient(135deg, #003087 0%, #002168 100%);
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+            box-shadow: 0 2px 8px rgba(0, 48, 135, 0.15);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-logos {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-logos img {
+            height: 24px;
+            filter: brightness(0) invert(1);
+        }
+
+        .nav-divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(255,255,255,0.5);
+        }
+
+        .nav-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.01em;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link {
+            padding: 0.5rem 1rem;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            letter-spacing: -0.01em;
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255,255,255,0.12);
+            transform: translateY(-1px);
+        }
+
+        .nav-link.active {
+            color: white;
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Main Layout */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content { grid-template-columns: 1fr; }
+        }
+
+        /* Page Header */
+        .page-header {
+            grid-column: 1 / -1;
+            margin-bottom: 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.375rem;
+            letter-spacing: -0.02em;
+        }
+
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Task Selector */
+        .task-selector {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .task-selector h2 {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .task-search {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .task-search input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: var(--bg-white);
+        }
+
+        .task-search input:focus {
+            outline: none;
+            border-color: var(--cg-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .task-search::before {
+            content: "🔍";
+            position: absolute;
+            left: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.9rem;
+        }
+
+        .task-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+        }
+
+        .task-item {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: background 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .task-item:last-child { border-bottom: none; }
+        .task-item:hover { background: var(--bg-primary); }
+
+        .task-item.selected {
+            background: rgba(59, 130, 246, 0.08);
+            border-left: 3px solid var(--cg-blue);
+        }
+
+        .task-id {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--cg-blue);
+            background: rgba(59, 130, 246, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .task-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .task-status-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .status-not-started { background: #f3f4f6; color: #6b7280; }
+        .status-in-progress { background: rgba(59, 130, 246, 0.1); color: var(--cg-blue); }
+        .status-completed { background: var(--success-light); color: var(--cg-green); }
+        .status-blocked { background: var(--danger-light); color: var(--cg-red); }
+
+        /* Update Form */
+        .update-form {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .form-header h2 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .form-header .task-badge {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--cg-navy);
+            background: rgba(0, 48, 135, 0.1);
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+        }
+
+        .form-group { margin-bottom: 1.25rem; }
+
+        .form-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Status Options */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .status-option { position: relative; }
+        .status-option input { position: absolute; opacity: 0; }
+
+        .status-option label {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .status-option label:hover {
+            border-color: var(--cg-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.05);
+        }
+
+        .status-option input:checked + label {
+            background: rgba(59, 130, 246, 0.08);
+            border-color: var(--cg-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .opt-not-started .status-dot { background: #9ca3af; }
+        .opt-in-progress .status-dot { background: var(--cg-blue); }
+        .opt-completed .status-dot { background: var(--cg-green); }
+        .opt-blocked .status-dot { background: var(--cg-red); }
+
+        /* Progress Slider */
+        .progress-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--cg-blue);
+            letter-spacing: -0.02em;
+        }
+
+        .progress-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-light);
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .progress-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--cg-blue);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+            transition: all 0.2s;
+        }
+
+        .progress-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 8px rgba(59, 130, 246, 0.4);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: vertical;
+            transition: all 0.2s;
+            background: var(--bg-white);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--cg-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        textarea::placeholder { color: var(--text-muted); }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #003087 0%, #002168 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 0.5rem;
+            letter-spacing: -0.01em;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 48, 135, 0.25);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sidebar-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-card h3 {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .progress-ring { text-align: center; margin-bottom: 1rem; }
+
+        .progress-ring-value {
+            font-size: 2.75rem;
+            font-weight: 800;
+            color: var(--cg-navy);
+            letter-spacing: -0.03em;
+        }
+
+        .progress-ring-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .progress-bar-bg {
+            height: 6px;
+            background: var(--border-light);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--cg-navy), var(--cg-blue));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .status-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .status-item {
+            text-align: center;
+            padding: 0.875rem;
+            background: var(--bg-primary);
+            border-radius: 6px;
+        }
+
+        .status-count {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+        .status-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            margin-top: 0.125rem;
+        }
+
+        .quick-links { display: flex; flex-direction: column; gap: 0.5rem; }
+
+        .quick-link {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .quick-link:hover {
+            background: rgba(59, 130, 246, 0.08);
+            color: var(--cg-blue);
+            transform: translateX(2px);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: var(--cg-green); }
+        .toast.error { background: var(--cg-red); }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        .empty-state h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+        .empty-state p {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+    
+
+        /* === SHAREPOINT COMPATIBILITY FIXES === */
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+        }
+        .nav-link.active {
+            color: white !important;
+            background: rgba(255,255,255,0.15) !important;
+        }
+
+    
+
+        /* === TEXT OVERFLOW PROTECTION === */
+
+        /* Prevent horizontal overflow on body/containers */
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
+        /* Single-line text truncation */
+        .nav-title,
+        .pillar-name,
+        .criteria-label,
+        .metric-label,
+        .milestone-text,
+        .product-name,
+        .kpi-label,
+        .task-title,
+        .gantt-task-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Multi-line text truncation */
+        .pillar-how,
+        .task-description,
+        .description-text {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-clamp: 2;
+        }
+
+        /* Prevent card/container overflow */
+        .card,
+        .sidebar-card,
+        .gantt-row,
+        .task-row {
+            overflow: hidden;
+            max-width: 100%;
+        }
+
+        /* Word break for long values */
+        .value,
+        .metric-value,
+        .stat-value {
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-brand">
+            <div class="nav-logos">
+                <img src="/sites/PrincipalGTMStrategy-InternalUseOnly/Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/Site/Assets/transparent/ArrowTruLine.png" alt="Arrow Tru-Line" style="height: 22px;">
+                <div class="nav-divider"></div>
+                <img src="/sites/PrincipalGTMStrategy-InternalUseOnly/Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/Site/Assets/transparent/Chamberlain-logo-blue.png" alt="Chamberlain Group" style="height: 18px;">
+            </div>
+            <span class="nav-title">2026 Integration Plan</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Dashboard</a>
+            <a href="ATL_Project_Gantt.html" class="nav-link">Gantt</a>
+            <a href="ATL_Status_Hub.html" class="nav-link">Status</a>
+            <a href="ATL_My_Tasks.html" class="nav-link">My Tasks</a>
+            <a href="ATL_Team_Workload.html" class="nav-link">Teams</a>
+            <a href="ATL_Reports.html" class="nav-link">Reports</a>
+            <a href="ATL_Admin.html" class="nav-link">Admin</a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <h1>Task Update Portal</h1>
+            <p>Select a task to update its status, progress, and notes</p>
+        </div>
+
+        <div class="primary-content">
+            <div class="task-selector">
+                <h2>Select Task</h2>
+                <div class="task-search">
+                    <input type="text" id="taskSearch" placeholder="Search tasks by ID or name...">
+                </div>
+                <div class="task-list" id="taskList"></div>
+            </div>
+
+            <div class="update-form" id="updateForm" style="display: none;">
+                <div class="form-header">
+                    <h2 id="selectedTaskTitle">Update Task</h2>
+                    <span class="task-badge" id="selectedTaskId">T001</span>
+                </div>
+
+                <form id="taskUpdateForm">
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <div class="status-grid">
+                            <div class="status-option opt-not-started">
+                                <input type="radio" name="status" id="statusNotStarted" value="Not Started">
+                                <label for="statusNotStarted"><span class="status-dot"></span>Not Started</label>
+                            </div>
+                            <div class="status-option opt-in-progress">
+                                <input type="radio" name="status" id="statusInProgress" value="In Progress">
+                                <label for="statusInProgress"><span class="status-dot"></span>In Progress</label>
+                            </div>
+                            <div class="status-option opt-completed">
+                                <input type="radio" name="status" id="statusCompleted" value="Completed">
+                                <label for="statusCompleted"><span class="status-dot"></span>Completed</label>
+                            </div>
+                            <div class="status-option opt-blocked">
+                                <input type="radio" name="status" id="statusBlocked" value="Blocked">
+                                <label for="statusBlocked"><span class="status-dot"></span>Blocked</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Progress</label>
+                        <div class="progress-display">
+                            <span class="progress-value" id="progressValue">0%</span>
+                        </div>
+                        <input type="range" class="progress-slider" id="progressSlider" min="0" max="100" value="0">
+                    </div>
+
+                    <div class="form-group" id="blockerGroup" style="display: none;">
+                        <label class="form-label">Blocker Details (Required)</label>
+                        <textarea id="blockerDetails" placeholder="Describe what's blocking this task..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Notes / Updates</label>
+                        <textarea id="taskNotes" placeholder="Add any notes or updates about this task..."></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">Submit Update</button>
+                </form>
+            </div>
+
+            <div class="empty-state" id="emptyState">
+                <div class="empty-state-icon">📋</div>
+                <h3>Select a Task</h3>
+                <p>Choose a task from the list above to update its status</p>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="sidebar-card">
+                <h3>Project Progress</h3>
+                <div class="progress-ring">
+                    <div class="progress-ring-value" id="overallProgress">35%</div>
+                    <div class="progress-ring-label">Overall Completion</div>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressBarFill" style="width: 35%;"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3>Task Status</h3>
+                <div class="status-summary">
+                    <div class="status-item">
+                        <div class="status-count" id="countCompleted">12</div>
+                        <div class="status-label">Completed</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-count" id="countInProgress">8</div>
+                        <div class="status-label">In Progress</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-count" id="countNotStarted">6</div>
+                        <div class="status-label">Not Started</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-count" id="countBlocked">1</div>
+                        <div class="status-label">Blocked</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3>Quick Links</h3>
+                <div class="quick-links">
+                    <a href="/sites/PrincipalGTMStrategy-InternalUseOnly/SitePages/ATL-Integration-Dashboard.aspx" class="quick-link">📊 Executive Dashboard</a>
+                    <a href="ATL_Project_Gantt.html" class="quick-link">📅 Project Timeline</a>
+                    <a href="/sites/PrincipalGTMStrategy-InternalUseOnly/Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/Site/Setup/ATL_Executive_Dashboard_Dynamic.html" class="quick-link">📈 Live Metrics</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        var POWER_AUTOMATE_URL = '{{POWER_AUTOMATE_TASK_UPDATE_URL}}';
+        var DASHBOARD_API_URL = '{{POWER_AUTOMATE_DASHBOARD_API_URL}}';
+
+        var tasks = [
+            { id: 'T001', title: 'Budget & Financial Planning', status: 'In Progress', progress: 45, phase: 1, owner: 'Ken' },
+            { id: 'T002', title: 'Pipeline Validation', status: 'In Progress', progress: 30, phase: 1, owner: 'Tony' },
+            { id: 'T004', title: 'Dashboard Automation', status: 'Not Started', progress: 0, phase: 1, owner: 'Jason' },
+            { id: 'T006', title: 'Lost Customer Win-Back', status: 'Not Started', progress: 0, phase: 1, owner: 'Kedaresh' },
+            { id: 'T007', title: 'Weekly Cadence Setup', status: 'Completed', progress: 100, phase: 1, owner: 'Tony' },
+            { id: 'T008', title: 'Reporting Foundation', status: 'In Progress', progress: 20, phase: 1, owner: 'Jason' },
+            { id: 'T009', title: 'CRU Index Pricing', status: 'Not Started', progress: 0, phase: 2, owner: 'Larry' },
+            { id: 'T010', title: 'Inventory Accuracy', status: 'Not Started', progress: 0, phase: 2, owner: 'Ken' },
+            { id: 'T011', title: 'Product Catalog', status: 'Not Started', progress: 0, phase: 2, owner: 'John' },
+            { id: 'T012', title: 'Sales Transformation', status: 'Not Started', progress: 0, phase: 2, owner: 'John' },
+            { id: 'T013', title: 'Margin Improvement', status: 'Not Started', progress: 0, phase: 2, owner: 'Larry' },
+            { id: 'T014', title: 'OEM Partnership', status: 'Blocked', progress: 15, phase: 2, owner: 'Kedaresh' }
+        ];
+
+        var selectedTask = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTasks();
+            updateSummary();
+            setupEventListeners();
+            fetchLiveData();
+        });
+
+        function fetchLiveData() {
+            if (!DASHBOARD_API_URL || DASHBOARD_API_URL.indexOf('{{') !== -1) {
+                console.log('Dashboard API URL not configured, using sample data');
+                return;
+            }
+            fetch(DASHBOARD_API_URL)
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    if (data.tasks) {
+                        tasks = data.tasks.map(function(t) {
+                            return {
+                                id: t.TaskID || t.id,
+                                title: t.Title || t.title,
+                                status: t.Status || t.status || 'Not Started',
+                                progress: t.PercentComplete || t.progress || 0,
+                                phase: t.Phase || 1,
+                                owner: t.Owner || t.owner || 'Unassigned'
+                            };
+                        });
+                        renderTasks();
+                        updateSummary();
+                    }
+                })
+                .catch(function(error) { console.log('Using sample data:', error.message); });
+        }
+
+        function createTaskItem(task) {
+            var item = document.createElement('div');
+            item.className = 'task-item' + (selectedTask && selectedTask.id === task.id ? ' selected' : '');
+            item.setAttribute('data-task-id', task.id);
+
+            var idSpan = document.createElement('span');
+            idSpan.className = 'task-id';
+            idSpan.textContent = task.id;
+
+            var titleSpan = document.createElement('span');
+            titleSpan.className = 'task-title';
+            titleSpan.textContent = task.title;
+
+            var statusSpan = document.createElement('span');
+            statusSpan.className = 'task-status-badge status-' + task.status.toLowerCase().replace(/ /g, '-');
+            statusSpan.textContent = task.status;
+
+            item.appendChild(idSpan);
+            item.appendChild(titleSpan);
+            item.appendChild(statusSpan);
+
+            item.addEventListener('click', function() { selectTask(task.id); });
+            return item;
+        }
+
+        function renderTasks(filter) {
+            filter = filter || '';
+            var taskList = document.getElementById('taskList');
+            while (taskList.firstChild) { taskList.removeChild(taskList.firstChild); }
+
+            var filteredTasks = tasks.filter(function(task) {
+                return task.id.toLowerCase().indexOf(filter.toLowerCase()) !== -1 ||
+                       task.title.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+            });
+
+            if (filteredTasks.length === 0) {
+                var emptyDiv = document.createElement('div');
+                emptyDiv.className = 'empty-state';
+                var emptyP = document.createElement('p');
+                emptyP.textContent = 'No tasks found';
+                emptyDiv.appendChild(emptyP);
+                taskList.appendChild(emptyDiv);
+                return;
+            }
+
+            filteredTasks.forEach(function(task) { taskList.appendChild(createTaskItem(task)); });
+        }
+
+        function selectTask(taskId) {
+            selectedTask = tasks.find(function(t) { return t.id === taskId; });
+            if (!selectedTask) return;
+
+            document.getElementById('updateForm').style.display = 'block';
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('selectedTaskId').textContent = selectedTask.id;
+            document.getElementById('selectedTaskTitle').textContent = selectedTask.title;
+
+            var statusRadio = document.querySelector('input[name="status"][value="' + selectedTask.status + '"]');
+            if (statusRadio) statusRadio.checked = true;
+
+            document.getElementById('progressSlider').value = selectedTask.progress;
+            document.getElementById('progressValue').textContent = selectedTask.progress + '%';
+            document.getElementById('blockerGroup').style.display = selectedTask.status === 'Blocked' ? 'block' : 'none';
+
+            renderTasks(document.getElementById('taskSearch').value);
+        }
+
+        function setupEventListeners() {
+            document.getElementById('taskSearch').addEventListener('input', function(e) { renderTasks(e.target.value); });
+            document.getElementById('progressSlider').addEventListener('input', function(e) {
+                document.getElementById('progressValue').textContent = e.target.value + '%';
+            });
+            document.querySelectorAll('input[name="status"]').forEach(function(radio) {
+                radio.addEventListener('change', function(e) {
+                    document.getElementById('blockerGroup').style.display = e.target.value === 'Blocked' ? 'block' : 'none';
+                });
+            });
+            document.getElementById('taskUpdateForm').addEventListener('submit', handleSubmit);
+        }
+
+        function handleSubmit(e) {
+            e.preventDefault();
+            if (!selectedTask) { showToast('Please select a task first', 'error'); return; }
+
+            var statusRadio = document.querySelector('input[name="status"]:checked');
+            var status = statusRadio ? statusRadio.value : null;
+            if (!status) { showToast('Please select a status', 'error'); return; }
+
+            var progress = parseInt(document.getElementById('progressSlider').value);
+            var blockers = document.getElementById('blockerDetails').value;
+            var notes = document.getElementById('taskNotes').value;
+
+            if (status === 'Blocked' && !blockers.trim()) { showToast('Please describe the blocker', 'error'); return; }
+
+            var formData = {
+                taskId: selectedTask.id,
+                taskTitle: selectedTask.title,
+                status: status,
+                progress: progress,
+                blockers: blockers,
+                notes: notes,
+                submittedBy: 'User',
+                submittedAt: new Date().toISOString()
+            };
+
+            var submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            var submitPromise = Promise.resolve();
+            if (POWER_AUTOMATE_URL && POWER_AUTOMATE_URL.indexOf('{{') === -1) {
+                submitPromise = fetch(POWER_AUTOMATE_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                }).then(function(response) { if (!response.ok) throw new Error('Update failed'); });
+            }
+
+            submitPromise.then(function() {
+                var taskIndex = tasks.findIndex(function(t) { return t.id === selectedTask.id; });
+                if (taskIndex !== -1) {
+                    tasks[taskIndex].status = status;
+                    tasks[taskIndex].progress = progress;
+                }
+                document.getElementById('blockerDetails').value = '';
+                document.getElementById('taskNotes').value = '';
+                renderTasks(document.getElementById('taskSearch').value);
+                updateSummary();
+                showToast('Task updated successfully!', 'success');
+            }).catch(function(error) {
+                showToast('Failed to update task. Please try again.', 'error');
+                console.error('Submit error:', error);
+            }).finally(function() {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Update';
+            });
+        }
+
+        function updateSummary() {
+            var counts = {
+                completed: tasks.filter(function(t) { return t.status === 'Completed'; }).length,
+                inProgress: tasks.filter(function(t) { return t.status === 'In Progress'; }).length,
+                notStarted: tasks.filter(function(t) { return t.status === 'Not Started'; }).length,
+                blocked: tasks.filter(function(t) { return t.status === 'Blocked'; }).length
+            };
+            document.getElementById('countCompleted').textContent = counts.completed;
+            document.getElementById('countInProgress').textContent = counts.inProgress;
+            document.getElementById('countNotStarted').textContent = counts.notStarted;
+            document.getElementById('countBlocked').textContent = counts.blocked;
+
+            var totalProgress = tasks.reduce(function(sum, t) { return sum + t.progress; }, 0);
+            var overallProgress = Math.round(totalProgress / tasks.length);
+            document.getElementById('overallProgress').textContent = overallProgress + '%';
+            document.getElementById('progressBarFill').style.width = overallProgress + '%';
+        }
+
+        function showToast(message, type) {
+            var toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + (type || 'success') + ' show';
+            setTimeout(function() { toast.classList.remove('show'); }, 3000);
+        }
+    </script>
+    <script src="spApi.js"></script>
+</body>
+</html>

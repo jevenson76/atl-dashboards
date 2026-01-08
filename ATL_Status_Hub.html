@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATL Integration | Status Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cg-navy: #003087;
+            --cg-navy-dark: #00256b;
+            --cg-blue: #3b82f6;
+            --arrow-blue: #4A90D9;
+            --arrow-red: #E94E4E;
+            --bg-primary: #f9fafb;
+            --bg-white: #ffffff;
+            --bg-light: #f8fafc;
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #fbbf24;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-xl: 12px;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 12px rgba(0,0,0,0.15);
+            --font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font); background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        nav { position: relative; z-index: 100; background: var(--cg-navy); padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; height: 56px; }
+        .nav-brand { display: flex; align-items: center; gap: 1rem; }
+        .nav-logos { display: flex; align-items: center; gap: 0.75rem; }
+        .nav-logos img { height: 24px; filter: brightness(0) invert(1); }
+        .nav-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.5); }
+        .nav-title { font-size: 0.85rem; font-weight: 600; color: white; }
+        .nav-links { display: flex; align-items: center; gap: 0.5rem; }
+        .nav-link { padding: 0.4rem 0.875rem; color: rgba(255,255,255,0.9) !important; text-decoration: none; font-size: 0.8rem; font-weight: 500; border-radius: var(--radius-sm); transition: all 0.2s; position: relative; }
+        .nav-link:hover { color: white !important; background: rgba(255,255,255,0.12); }
+        .nav-link.active { color: white !important; background: rgba(255,255,255,0.15) !important; }
+
+        .main-content { max-width: 1400px; margin: 0 auto; padding: 2rem; animation: fadeIn 0.4s ease-out; }
+
+        .meeting-header { background: linear-gradient(135deg, var(--cg-navy) 0%, var(--cg-navy-dark) 100%); border-radius: var(--radius-xl); padding: 2rem; color: white; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; position: relative; overflow: hidden; animation: fadeInUp 0.5s ease-out; }
+        .meeting-header::before { content: ''; position: absolute; right: 0; width: 50%; height: 100%; background: radial-gradient(ellipse at 80% 20%, rgba(74, 144, 217, 0.15) 0%, transparent 60%); }
+        .meeting-info h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .meeting-info p { opacity: 0.8; font-size: 0.9rem; }
+        .meeting-date { text-align: right; }
+        .meeting-date-label { font-size: 0.75rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
+        .meeting-date-value { font-size: 1.5rem; font-weight: 700; }
+
+        .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+
+        .status-card { background: white; border-radius: var(--radius-xl); border: 1px solid var(--border); box-shadow: var(--shadow-sm); overflow: hidden; transition: all 0.25s; animation: fadeInUp 0.5s ease-out backwards; }
+        .status-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .status-card-header { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg-light); }
+        .status-card-title { font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; color: var(--cg-navy); text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-card-badge { padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+        .badge-green { background: var(--success); color: white; }
+        .badge-yellow { background: var(--warning); color: white; }
+        .badge-red { background: var(--danger); color: white; }
+        .status-card-body { padding: 1.5rem; }
+
+        .quick-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+        .quick-stat { text-align: center; padding: 1.5rem; background: white; border: 1px solid var(--border); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); transition: all 0.2s ease; border-top: 4px solid var(--cg-blue); }
+        .quick-stat:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .quick-stat-value { font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, var(--cg-navy), var(--cg-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 0.5rem 0; }
+        .quick-stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+
+        .discussion-item { padding: 1rem; margin-bottom: 0.75rem; background: var(--bg-light); border-radius: var(--radius-lg); border-left: 4px solid transparent; transition: all 0.2s ease; }
+        .discussion-item:last-child { margin-bottom: 0; }
+        .discussion-item:hover { background: white; border-left-color: var(--cg-blue); }
+        .discussion-header { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.5rem; }
+        .discussion-priority { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+        .priority-high { background: var(--danger); box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2); }
+        .priority-medium { background: var(--warning); box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2); }
+        .priority-low { background: var(--cg-blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+        .discussion-title { font-size: 0.9rem; font-weight: 600; flex: 1; color: var(--text-primary); }
+        .discussion-owner { font-size: 0.75rem; color: var(--cg-blue); font-weight: 600; }
+        .discussion-notes { font-size: 0.85rem; color: var(--text-secondary); padding-left: 1.75rem; line-height: 1.6; }
+
+        .update-item { display: flex; gap: 1rem; padding: 0.875rem; margin-bottom: 0.5rem; background: var(--bg-light); border-radius: var(--radius-lg); transition: all 0.2s ease; }
+        .update-item:last-child { margin-bottom: 0; }
+        .update-item:hover { background: white; transform: translateX(4px); }
+        .update-icon { width: 36px; height: 36px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; font-weight: 700; }
+        .update-icon.completed { background: var(--success); color: white; }
+        .update-icon.progress { background: var(--cg-blue); color: white; }
+        .update-icon.blocked { background: var(--danger); color: white; }
+        .update-content { flex: 1; }
+        .update-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem; color: var(--text-primary); }
+        .update-meta { font-size: 0.75rem; color: var(--text-secondary); }
+
+        .action-item { display: flex; align-items: center; gap: 0.875rem; padding: 1rem; background: var(--bg-light); border-radius: var(--radius-lg); margin-bottom: 0.5rem; border: 1px solid transparent; transition: all 0.2s ease; }
+        .action-item:last-child { margin-bottom: 0; }
+        .action-item:hover { background: white; border-color: var(--border); }
+        .action-checkbox { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: var(--radius-sm); flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+        .action-checkbox:hover { border-color: var(--cg-blue); transform: scale(1.1); }
+        .action-checkbox.checked { background: var(--success); border-color: var(--success); color: white; font-size: 0.75rem; }
+        .action-text { flex: 1; font-size: 0.9rem; color: var(--text-primary); font-weight: 500; }
+        .action-owner { font-size: 0.75rem; color: var(--cg-blue); font-weight: 700; }
+        .action-due { font-size: 0.75rem; color: var(--text-secondary); }
+
+        .notes-area { width: 100%; min-height: 120px; padding: 1.25rem; border: 1px solid var(--border); background: var(--bg-light); border-radius: var(--radius-lg); font-family: var(--font); font-size: 0.9rem; resize: vertical; transition: all 0.2s ease; line-height: 1.6; }
+        .notes-area:hover { border-color: var(--cg-blue); background: white; }
+        .notes-area:focus { outline: none; border-color: var(--cg-blue); background: white; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+
+        .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.875rem 1.5rem; border: none; border-radius: var(--radius-lg); font-size: 0.85rem; font-weight: 700; font-family: var(--font); cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-primary { background: var(--cg-navy); color: white; box-shadow: var(--shadow-sm); }
+        .btn-primary:hover { background: var(--cg-navy-dark); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .btn-secondary { background: white; color: var(--cg-navy); border: 2px solid var(--border); }
+        .btn-secondary:hover { border-color: var(--cg-blue); color: var(--cg-blue); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+        .btn-group { display: flex; gap: 1rem; margin-top: 1.25rem; }
+
+        .next-milestone { background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%); color: white; padding: 1.5rem; border-radius: var(--radius-xl); display: flex; align-items: center; gap: 1.25rem; transition: all 0.2s ease; box-shadow: var(--shadow-sm); }
+        .next-milestone:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        .next-milestone-content { flex: 1; }
+        .next-milestone-label { font-size: 0.75rem; opacity: 0.95; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .next-milestone-title { font-size: 1.1rem; font-weight: 700; margin-top: 0.25rem; }
+        .next-milestone-date { font-size: 1.5rem; font-weight: 800; }
+
+        .data-timestamp { font-size: 0.7rem; color: var(--text-muted); text-align: center; padding: 1rem; }
+
+        html, body { overflow-x: hidden; max-width: 100%; }
+        .nav-title, .discussion-title, .update-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        @media (max-width: 1200px) {
+            .quick-stats { grid-template-columns: repeat(2, 1fr); }
+            .status-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .main-content { padding: 1rem; }
+            .meeting-header { padding: 1.5rem; flex-direction: column; align-items: flex-start; }
+            .meeting-date { text-align: left; margin-top: 1rem; }
+            .quick-stats { grid-template-columns: 1fr; gap: 1rem; }
+            .nav-links { display: none; }
+            .btn-group { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-brand">
+            <div class="nav-logos">
+                <img src="Assets/transparent/ArrowTruLine.png" alt="Arrow Tru-Line">
+                <div class="nav-divider"></div>
+                <img src="Assets/transparent/Chamberlain-logo-blue.png" alt="Chamberlain Group">
+            </div>
+            <span class="nav-title">2026 Integration Plan</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Dashboard</a>
+            <a href="ATL_Project_Gantt.html" class="nav-link">Gantt</a>
+            <a href="ATL_Status_Hub.html" class="nav-link active">Status</a>
+            <a href="ATL_My_Tasks.html" class="nav-link">My Tasks</a>
+            <a href="ATL_Team_Workload.html" class="nav-link">Teams</a>
+            <a href="ATL_Reports.html" class="nav-link">Reports</a>
+            <a href="ATL_Admin.html" class="nav-link">Admin</a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="meeting-header">
+            <div class="meeting-info">
+                <h1>Weekly Status Meeting</h1>
+                <p>ATL Integration Project - Leadership Review</p>
+            </div>
+            <div class="meeting-date">
+                <div class="meeting-date-label">Meeting Date</div>
+                <div class="meeting-date-value" id="meetingDate"></div>
+            </div>
+        </div>
+
+        <div class="quick-stats" id="quickStats"></div>
+
+        <div class="status-grid">
+            <div class="status-card">
+                <div class="status-card-header">
+                    <span class="status-card-title">Discussion Topics</span>
+                    <span class="status-card-badge badge-yellow" id="discussionBadge">Loading...</span>
+                </div>
+                <div class="status-card-body" id="discussionTopics"></div>
+            </div>
+
+            <div class="status-card">
+                <div class="status-card-header">
+                    <span class="status-card-title">This Week's Updates</span>
+                    <span class="status-card-badge badge-green" id="updatesBadge">Loading...</span>
+                </div>
+                <div class="status-card-body" id="weeklyUpdates"></div>
+            </div>
+
+            <div class="status-card">
+                <div class="status-card-header">
+                    <span class="status-card-title">Action Items</span>
+                    <span class="status-card-badge badge-yellow" id="actionsBadge">Loading...</span>
+                </div>
+                <div class="status-card-body" id="actionItems"></div>
+            </div>
+
+            <div class="status-card">
+                <div class="status-card-header">
+                    <span class="status-card-title">Next Milestone</span>
+                </div>
+                <div class="status-card-body" id="nextMilestone"></div>
+            </div>
+
+            <div class="status-card" style="grid-column: 1 / -1;">
+                <div class="status-card-header">
+                    <span class="status-card-title">Meeting Notes</span>
+                </div>
+                <div class="status-card-body">
+                    <textarea class="notes-area" id="meetingNotes" placeholder="Enter meeting notes, decisions, and follow-ups here..."></textarea>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="saveNotesBtn">Save Notes</button>
+                        <button class="btn btn-secondary" id="exportNotesBtn">Export to PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="data-timestamp" id="dataTimestamp">Loading data...</div>
+    </div>
+
+    <!-- SharePoint REST API Helper -->
+    <script src="spApi.js"></script>
+
+    <script>
+        // Fallback data
+        var fallbackData = {
+            quickStats: [
+                { value: 172, label: 'Total Tasks' },
+                { value: 45, label: 'Completed' },
+                { value: 8, label: 'Blocked' },
+                { value: '26%', label: 'Progress' }
+            ],
+            discussions: [
+                { title: 'Budget Timeline at Risk', priority: 'high', owner: 'Ken Sittman', notes: 'Q4 actuals needed to finalize projections. Finance team ETA by EOD Friday.' },
+                { title: 'CRU Pricing Data Gap', priority: 'high', owner: 'Larry Jones', notes: 'Historical pricing missing from legacy system. IT investigating data recovery options.' },
+                { title: 'Sales Territory Alignment', priority: 'medium', owner: 'John McLaughlin', notes: 'Draft territory map ready for review. Need sign-off from regional managers.' },
+                { title: 'Training Content Vendor', priority: 'low', owner: 'Jennifer Binns', notes: 'Three vendors shortlisted. RFP responses due next week.' }
+            ],
+            updates: [
+                { type: 'completed', title: 'Weekly Cadence Setup', meta: 'Completed by Tony P.' },
+                { type: 'completed', title: 'Stakeholder Matrix Updated', meta: 'Completed by Jason E.' },
+                { type: 'progress', title: 'Pipeline Validation', meta: '30% complete - Tony P.' },
+                { type: 'progress', title: 'Dashboard Automation', meta: 'Started - Jason E.' },
+                { type: 'blocked', title: 'OEM Partnership', meta: 'Legal review pending - Kedaresh D.' }
+            ],
+            actions: [
+                { text: 'Follow up with Finance on Q4 actuals', owner: 'Ken S.', due: 'Dec 20', checked: false },
+                { text: 'Schedule IT meeting for data recovery', owner: 'Larry J.', due: 'Dec 20', checked: false },
+                { text: 'Distribute territory map to regional managers', owner: 'John M.', due: 'Dec 22', checked: false },
+                { text: 'Review vendor RFP responses', owner: 'Jennifer B.', due: 'Dec 27', checked: false },
+                { text: 'Update project dashboard metrics', owner: 'Jason E.', due: 'Dec 20', checked: true },
+                { text: 'Send weekly status email', owner: 'Tony P.', due: 'Dec 20', checked: true }
+            ],
+            nextMilestone: { title: 'Budget & Financial Planning', date: 'Dec 19' }
+        };
+
+        var statusData = null;
+        var dataSource = 'loading';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setMeetingDate();
+            loadData();
+            loadNotes();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('saveNotesBtn').addEventListener('click', saveNotes);
+            document.getElementById('exportNotesBtn').addEventListener('click', exportNotes);
+        }
+
+        function setMeetingDate() {
+            var today = new Date();
+            var options = { weekday: 'short', month: 'short', day: 'numeric' };
+            document.getElementById('meetingDate').textContent = today.toLocaleDateString('en-US', options);
+        }
+
+        function loadData() {
+            spApi.getTasks({
+                select: 'Id,Title,Status,Priority,Owner,DueDate,Modified,IsBlocked,BlockerReason',
+                top: 500
+            }).then(function(tasks) {
+                // Calculate stats from live data
+                var total = tasks.length;
+                var completed = 0;
+                var blocked = 0;
+                var recentUpdates = [];
+                var blockedTasks = [];
+
+                var oneWeekAgo = new Date();
+                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+                tasks.forEach(function(task) {
+                    var status = (task.Status || '').toLowerCase();
+                    if (status === 'complete' || status === 'completed') {
+                        completed++;
+                    }
+                    if (status === 'blocked' || task.IsBlocked) {
+                        blocked++;
+                        blockedTasks.push(task);
+                    }
+
+                    // Track recent updates
+                    var modified = new Date(task.Modified);
+                    if (modified > oneWeekAgo) {
+                        recentUpdates.push(task);
+                    }
+                });
+
+                var progress = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+                // Build updates from recent activity
+                var updates = recentUpdates.slice(0, 5).map(function(task) {
+                    var status = (task.Status || '').toLowerCase();
+                    var type = 'progress';
+                    if (status === 'complete' || status === 'completed') type = 'completed';
+                    if (status === 'blocked' || task.IsBlocked) type = 'blocked';
+
+                    return {
+                        type: type,
+                        title: task.Title,
+                        meta: (task.Owner || 'Unknown') + ' - ' + spApi.formatDate(task.Modified)
+                    };
+                });
+
+                // Build discussions from blocked/at-risk tasks
+                var discussions = blockedTasks.slice(0, 4).map(function(task) {
+                    return {
+                        title: task.Title,
+                        priority: 'high',
+                        owner: task.Owner || 'Unassigned',
+                        notes: task.BlockerReason || 'Blocked - needs attention'
+                    };
+                });
+
+                // Merge with fallback for any missing
+                if (discussions.length < 4) {
+                    discussions = discussions.concat(fallbackData.discussions.slice(discussions.length));
+                }
+                if (updates.length < 5) {
+                    updates = updates.concat(fallbackData.updates.slice(updates.length));
+                }
+
+                statusData = {
+                    quickStats: [
+                        { value: total, label: 'Total Tasks' },
+                        { value: completed, label: 'Completed' },
+                        { value: blocked, label: 'Blocked' },
+                        { value: progress + '%', label: 'Progress' }
+                    ],
+                    discussions: discussions,
+                    updates: updates,
+                    actions: fallbackData.actions, // Keep static for now
+                    nextMilestone: fallbackData.nextMilestone
+                };
+
+                dataSource = 'sharepoint';
+                renderAll();
+            }).catch(function(error) {
+                spApi.log('warn', 'Failed to load from SharePoint', error.message);
+                statusData = fallbackData;
+                dataSource = 'fallback';
+                renderAll();
+            });
+        }
+
+        function renderAll() {
+            renderQuickStats();
+            renderDiscussions();
+            renderUpdates();
+            renderActionItems();
+            renderNextMilestone();
+            updateTimestamp();
+        }
+
+        function renderQuickStats() {
+            var container = document.getElementById('quickStats');
+            while (container.firstChild) { container.removeChild(container.firstChild); }
+
+            statusData.quickStats.forEach(function(stat) {
+                var div = document.createElement('div');
+                div.className = 'quick-stat';
+
+                var value = document.createElement('div');
+                value.className = 'quick-stat-value';
+                value.textContent = stat.value;
+
+                var label = document.createElement('div');
+                label.className = 'quick-stat-label';
+                label.textContent = stat.label;
+
+                div.appendChild(value);
+                div.appendChild(label);
+                container.appendChild(div);
+            });
+        }
+
+        function renderDiscussions() {
+            var container = document.getElementById('discussionTopics');
+            var badge = document.getElementById('discussionBadge');
+
+            while (container.firstChild) { container.removeChild(container.firstChild); }
+            badge.textContent = statusData.discussions.length + ' Items';
+
+            statusData.discussions.forEach(function(item) {
+                var div = document.createElement('div');
+                div.className = 'discussion-item';
+
+                var header = document.createElement('div');
+                header.className = 'discussion-header';
+
+                var priority = document.createElement('div');
+                priority.className = 'discussion-priority priority-' + item.priority;
+
+                var title = document.createElement('div');
+                title.className = 'discussion-title';
+                title.textContent = item.title;
+
+                var owner = document.createElement('div');
+                owner.className = 'discussion-owner';
+                owner.textContent = item.owner;
+
+                header.appendChild(priority);
+                header.appendChild(title);
+                header.appendChild(owner);
+
+                var notes = document.createElement('div');
+                notes.className = 'discussion-notes';
+                notes.textContent = item.notes;
+
+                div.appendChild(header);
+                div.appendChild(notes);
+                container.appendChild(div);
+            });
+        }
+
+        function renderUpdates() {
+            var container = document.getElementById('weeklyUpdates');
+            var badge = document.getElementById('updatesBadge');
+
+            while (container.firstChild) { container.removeChild(container.firstChild); }
+            badge.textContent = statusData.updates.length + ' Updates';
+
+            statusData.updates.forEach(function(update) {
+                var div = document.createElement('div');
+                div.className = 'update-item';
+
+                var icon = document.createElement('div');
+                icon.className = 'update-icon ' + update.type;
+                if (update.type === 'completed') icon.textContent = '\u2713';
+                else if (update.type === 'progress') icon.textContent = '\u2192';
+                else if (update.type === 'blocked') icon.textContent = '!';
+
+                var content = document.createElement('div');
+                content.className = 'update-content';
+
+                var title = document.createElement('div');
+                title.className = 'update-title';
+                title.textContent = update.title;
+
+                var meta = document.createElement('div');
+                meta.className = 'update-meta';
+                meta.textContent = update.meta;
+
+                content.appendChild(title);
+                content.appendChild(meta);
+
+                div.appendChild(icon);
+                div.appendChild(content);
+                container.appendChild(div);
+            });
+        }
+
+        function renderActionItems() {
+            var container = document.getElementById('actionItems');
+            var badge = document.getElementById('actionsBadge');
+
+            while (container.firstChild) { container.removeChild(container.firstChild); }
+
+            var openCount = statusData.actions.filter(function(a) { return !a.checked; }).length;
+            badge.textContent = openCount + ' Open';
+
+            statusData.actions.forEach(function(action, index) {
+                var div = document.createElement('div');
+                div.className = 'action-item';
+
+                var checkbox = document.createElement('div');
+                checkbox.className = 'action-checkbox' + (action.checked ? ' checked' : '');
+                checkbox.textContent = action.checked ? '\u2713' : '';
+                checkbox.addEventListener('click', function() {
+                    action.checked = !action.checked;
+                    this.className = 'action-checkbox' + (action.checked ? ' checked' : '');
+                    this.textContent = action.checked ? '\u2713' : '';
+                    text.style.textDecoration = action.checked ? 'line-through' : 'none';
+                    // Update badge
+                    var newOpenCount = statusData.actions.filter(function(a) { return !a.checked; }).length;
+                    badge.textContent = newOpenCount + ' Open';
+                });
+
+                var text = document.createElement('div');
+                text.className = 'action-text';
+                text.textContent = action.text;
+                if (action.checked) text.style.textDecoration = 'line-through';
+
+                var owner = document.createElement('div');
+                owner.className = 'action-owner';
+                owner.textContent = action.owner;
+
+                var due = document.createElement('div');
+                due.className = 'action-due';
+                due.textContent = action.due;
+
+                div.appendChild(checkbox);
+                div.appendChild(text);
+                div.appendChild(owner);
+                div.appendChild(due);
+                container.appendChild(div);
+            });
+        }
+
+        function renderNextMilestone() {
+            var container = document.getElementById('nextMilestone');
+            while (container.firstChild) { container.removeChild(container.firstChild); }
+
+            var milestone = document.createElement('div');
+            milestone.className = 'next-milestone';
+
+            var content = document.createElement('div');
+            content.className = 'next-milestone-content';
+
+            var label = document.createElement('div');
+            label.className = 'next-milestone-label';
+            label.textContent = 'Coming Up';
+
+            var title = document.createElement('div');
+            title.className = 'next-milestone-title';
+            title.textContent = statusData.nextMilestone.title;
+
+            content.appendChild(label);
+            content.appendChild(title);
+
+            var date = document.createElement('div');
+            date.className = 'next-milestone-date';
+            date.textContent = statusData.nextMilestone.date;
+
+            milestone.appendChild(content);
+            milestone.appendChild(date);
+            container.appendChild(milestone);
+        }
+
+        function updateTimestamp() {
+            var el = document.getElementById('dataTimestamp');
+            var source = dataSource === 'sharepoint' ? 'Live from SharePoint' : 'Cached Data';
+            el.textContent = 'Data Updated: ' + spApi.formatDate(new Date(), true) + ' (' + source + ')';
+        }
+
+        function saveNotes() {
+            var notes = document.getElementById('meetingNotes').value;
+            localStorage.setItem('atl_meeting_notes', notes);
+            localStorage.setItem('atl_meeting_notes_date', new Date().toISOString());
+            alert('Notes saved locally!');
+        }
+
+        function loadNotes() {
+            var notes = localStorage.getItem('atl_meeting_notes');
+            if (notes) {
+                document.getElementById('meetingNotes').value = notes;
+            }
+        }
+
+        function exportNotes() {
+            alert('Export to PDF functionality - would integrate with browser print or PDF library.');
+        }
+    </script>
+</body>
+</html>

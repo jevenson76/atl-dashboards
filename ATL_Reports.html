@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATL Integration | Reports & Analytics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Brand Colors - Executive Palette */
+            --cg-navy: #003087;
+            --cg-blue: #3b82f6;
+            --success: #10b981;
+            --warning: #fbbf24;
+            --danger: #ef4444;
+            /* Backgrounds */
+            --bg-light: #f9fafb;
+            --bg-white: #ffffff;
+            /* Borders */
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+            /* Text */
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            /* Design Tokens */
+            --radius: 12px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
+            /* Typography */
+            --font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font); background: var(--bg-light); color: var(--text-primary); min-height: 100vh; -webkit-font-smoothing: antialiased; line-height: 1.6; }
+
+        /* Animations */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        nav { position: relative; z-index: 100; background: linear-gradient(135deg, var(--cg-navy) 0%, #00256b 100%); padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; height: 56px; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+        .nav-brand { display: flex; align-items: center; gap: 1rem; }
+        .nav-logos { display: flex; align-items: center; gap: 0.75rem; }
+        .nav-logos img { height: 24px; filter: brightness(0) invert(1); }
+        .nav-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.3); }
+        .nav-title { font-size: 0.85rem; font-weight: 700; color: white; }
+        .nav-links { display: flex; align-items: center; gap: 0.5rem; }
+        .nav-link { padding: 0.4rem 0.875rem; color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.8rem; font-weight: 600; border-radius: 6px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+        .nav-link:hover { color: white; background: rgba(255,255,255,0.12); }
+        .nav-link.active { color: white; background: rgba(255,255,255,0.2); }
+        .nav-link:focus-visible { outline: 2px solid var(--cg-blue); outline-offset: 2px; }
+
+        .main-content { max-width: 1400px; margin: 0 auto; padding: 2rem; animation: fadeIn 0.4s ease-out; }
+        .page-header { margin-bottom: 2rem; }
+        .page-header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--cg-navy); }
+        .page-header p { color: var(--text-secondary); font-size: 0.85rem; }
+
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .metric-card { background: white; border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-sm); text-align: center; border-top: 4px solid var(--success); }
+        .metric-card.health-amber { border-top-color: var(--warning); }
+        .metric-card.health-red { border-top-color: var(--danger); }
+        .metric-label { font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+        .metric-value { font-size: 2rem; font-weight: 700; margin: 0.5rem 0; background: linear-gradient(135deg, var(--cg-navy), var(--cg-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .metric-change { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+        .metric-change.positive { color: var(--success); }
+        .metric-change.negative { color: var(--danger); }
+
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .chart-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+        .chart-header { padding: 1rem 1.5rem; border-bottom: 2px solid var(--cg-blue); background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); }
+        .chart-title { font-size: 1rem; font-weight: 700; color: var(--cg-navy); }
+        .chart-body { padding: 1.5rem; }
+
+        .bar-chart { display: flex; flex-direction: column; gap: 0.75rem; }
+        .bar-row { display: flex; align-items: center; gap: 1rem; }
+        .bar-label { width: 100px; font-size: 0.85rem; font-weight: 600; text-align: right; flex-shrink: 0; color: var(--text-primary); }
+        .bar-container { flex: 1; height: 24px; background: var(--border-light); border-radius: 4px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+        .bar-value { width: 50px; font-size: 0.85rem; font-weight: 700; text-align: right; flex-shrink: 0; color: var(--text-primary); }
+
+        .trend-chart { height: 200px; display: flex; align-items: flex-end; gap: 8px; padding-top: 1rem; }
+        .trend-bar { flex: 1; background: var(--cg-blue); border-radius: 4px 4px 0 0; transition: height 0.5s ease; position: relative; min-width: 30px; }
+        .trend-bar:hover { background: var(--cg-navy); }
+        .trend-label { position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); font-size: 0.65rem; color: var(--text-secondary); white-space: nowrap; }
+
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .data-table th { text-align: left; padding: 1rem; background: var(--cg-navy); font-size: 0.75rem; font-weight: 700; color: white; text-transform: uppercase; }
+        .data-table td { padding: 1rem; border-bottom: 1px solid var(--border); }
+        .data-table tr:hover td { background: var(--bg-light); }
+
+        .status-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+        .status-green { background: var(--success); color: white; }
+        .status-yellow { background: var(--warning); color: white; }
+        .status-red { background: var(--danger); color: white; }
+
+        .filter-bar { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .filter-select { padding: 0.5rem 1rem; border: 2px solid var(--border); border-radius: 6px; font-size: 0.85rem; font-family: var(--font); background: white; cursor: pointer; transition: all 0.2s ease; }
+        .filter-select:hover { border-color: var(--cg-blue); }
+        .filter-select:focus { outline: none; border-color: var(--cg-blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+    
+
+        /* === SHAREPOINT COMPATIBILITY FIXES === */
+        .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+        }
+        .nav-link.active {
+            color: white !important;
+            background: rgba(255,255,255,0.15) !important;
+        }
+
+    
+
+        /* === TEXT OVERFLOW PROTECTION === */
+
+        /* Prevent horizontal overflow on body/containers */
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
+        /* Single-line text truncation */
+        .nav-title,
+        .pillar-name,
+        .criteria-label,
+        .metric-label,
+        .milestone-text,
+        .product-name,
+        .kpi-label,
+        .task-title,
+        .gantt-task-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Multi-line text truncation */
+        .pillar-how,
+        .task-description,
+        .description-text {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-clamp: 2;
+        }
+
+        /* Prevent card/container overflow */
+        .card,
+        .sidebar-card,
+        .gantt-row,
+        .task-row {
+            overflow: hidden;
+            max-width: 100%;
+        }
+
+        /* Word break for long values */
+        .value,
+        .metric-value,
+        .stat-value {
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-brand">
+            <div class="nav-logos">
+                <img src="/sites/PrincipalGTMStrategy-InternalUseOnly/Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/Site/Assets/transparent/ArrowTruLine.png" alt="Arrow Tru-Line">
+                <div class="nav-divider"></div>
+                <img src="/sites/PrincipalGTMStrategy-InternalUseOnly/Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/Site/Assets/transparent/Chamberlain-logo-blue.png" alt="Chamberlain Group">
+            </div>
+            <span class="nav-title">2026 Integration Plan</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Dashboard</a>
+            <a href="ATL_Project_Gantt.html" class="nav-link">Gantt</a>
+            <a href="ATL_Status_Hub.html" class="nav-link">Status</a>
+            <a href="ATL_My_Tasks.html" class="nav-link">My Tasks</a>
+            <a href="ATL_Team_Workload.html" class="nav-link">Teams</a>
+            <a href="ATL_Reports.html" class="nav-link active">Reports</a>
+            <a href="ATL_Admin.html" class="nav-link">Admin</a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <h1>Reports & Analytics</h1>
+            <p>Project performance metrics, trends, and detailed analysis</p>
+        </div>
+
+        <div class="filter-bar">
+            <select class="filter-select" id="timeRange">
+                <option value="week">This Week</option>
+                <option value="month" selected>This Month</option>
+                <option value="quarter">This Quarter</option>
+                <option value="all">All Time</option>
+            </select>
+            <select class="filter-select" id="phaseFilter">
+                <option value="all">All Phases</option>
+                <option value="1">Phase 1: Stabilization</option>
+                <option value="2">Phase 2: Foundation</option>
+                <option value="3">Phase 3: Acceleration</option>
+                <option value="4">Phase 4: Scale</option>
+                <option value="5">Phase 5: Optimization</option>
+            </select>
+        </div>
+
+        <div class="metrics-grid" id="metricsGrid"></div>
+        <div class="charts-grid" id="chartsGrid"></div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <span class="chart-title">Task Completion History</span>
+            </div>
+            <div class="chart-body">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Week</th>
+                            <th>Completed</th>
+                            <th>Added</th>
+                            <th>Blocked</th>
+                            <th>Velocity</th>
+                            <th>Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var reportData = {
+            metrics: [
+                { label: 'Total Tasks', value: 172, change: '+8', positive: true },
+                { label: 'Completed', value: 45, change: '+12 this week', positive: true },
+                { label: 'In Progress', value: 67, change: '+5', positive: true },
+                { label: 'Blocked', value: 8, change: '-2', positive: true },
+                { label: 'Completion Rate', value: '26%', change: '+4%', positive: true },
+                { label: 'On-Time Rate', value: '89%', change: '+3%', positive: true }
+            ],
+            phaseProgress: [
+                { label: 'Phase 1', value: 78, color: '#10b981' },
+                { label: 'Phase 2', value: 45, color: '#3b82f6' },
+                { label: 'Phase 3', value: 20, color: '#fbbf24' },
+                { label: 'Phase 4', value: 5, color: '#9ca3af' },
+                { label: 'Phase 5', value: 0, color: '#9ca3af' }
+            ],
+            weeklyTrend: [
+                { week: 'W1', completed: 8 },
+                { week: 'W2', completed: 12 },
+                { week: 'W3', completed: 6 },
+                { week: 'W4', completed: 15 },
+                { week: 'W5', completed: 10 },
+                { week: 'W6', completed: 14 },
+                { week: 'W7', completed: 18 },
+                { week: 'W8', completed: 12 }
+            ],
+            history: [
+                { week: 'Dec 16-20', completed: 12, added: 5, blocked: 2, velocity: 12 },
+                { week: 'Dec 9-13', completed: 18, added: 8, blocked: 1, velocity: 18 },
+                { week: 'Dec 2-6', completed: 14, added: 12, blocked: 3, velocity: 14 },
+                { week: 'Nov 25-29', completed: 10, added: 6, blocked: 4, velocity: 10 },
+                { week: 'Nov 18-22', completed: 15, added: 10, blocked: 2, velocity: 15 }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderMetrics();
+            renderCharts();
+            renderHistory();
+        });
+
+        function renderMetrics() {
+            var grid = document.getElementById('metricsGrid');
+            reportData.metrics.forEach(function(metric) {
+                var card = document.createElement('div');
+                card.className = 'metric-card';
+
+                // Add health status class based on metric label
+                if (metric.label === 'Blocked') {
+                    card.className += ' health-red';
+                } else if (metric.label === 'Completion Rate' && parseInt(metric.value) < 50) {
+                    card.className += ' health-amber';
+                }
+
+                var label = document.createElement('div');
+                label.className = 'metric-label';
+                label.textContent = metric.label;
+
+                var value = document.createElement('div');
+                value.className = 'metric-value';
+                value.textContent = metric.value;
+
+                var change = document.createElement('div');
+                change.className = 'metric-change ' + (metric.positive ? 'positive' : 'negative');
+                change.textContent = metric.change;
+
+                card.appendChild(label);
+                card.appendChild(value);
+                card.appendChild(change);
+                grid.appendChild(card);
+            });
+        }
+
+        function renderCharts() {
+            var grid = document.getElementById('chartsGrid');
+
+            // Phase Progress Chart
+            var phaseCard = document.createElement('div');
+            phaseCard.className = 'chart-card';
+
+            var phaseHeader = document.createElement('div');
+            phaseHeader.className = 'chart-header';
+            var phaseTitle = document.createElement('span');
+            phaseTitle.className = 'chart-title';
+            phaseTitle.textContent = 'Progress by Phase';
+            phaseHeader.appendChild(phaseTitle);
+
+            var phaseBody = document.createElement('div');
+            phaseBody.className = 'chart-body';
+            var barChart = document.createElement('div');
+            barChart.className = 'bar-chart';
+
+            reportData.phaseProgress.forEach(function(phase) {
+                var row = document.createElement('div');
+                row.className = 'bar-row';
+
+                var label = document.createElement('div');
+                label.className = 'bar-label';
+                label.textContent = phase.label;
+
+                var container = document.createElement('div');
+                container.className = 'bar-container';
+
+                var fill = document.createElement('div');
+                fill.className = 'bar-fill';
+                fill.style.width = phase.value + '%';
+                fill.style.background = phase.color;
+                container.appendChild(fill);
+
+                var value = document.createElement('div');
+                value.className = 'bar-value';
+                value.textContent = phase.value + '%';
+
+                row.appendChild(label);
+                row.appendChild(container);
+                row.appendChild(value);
+                barChart.appendChild(row);
+            });
+
+            phaseBody.appendChild(barChart);
+            phaseCard.appendChild(phaseHeader);
+            phaseCard.appendChild(phaseBody);
+            grid.appendChild(phaseCard);
+
+            // Weekly Trend Chart
+            var trendCard = document.createElement('div');
+            trendCard.className = 'chart-card';
+
+            var trendHeader = document.createElement('div');
+            trendHeader.className = 'chart-header';
+            var trendTitle = document.createElement('span');
+            trendTitle.className = 'chart-title';
+            trendTitle.textContent = 'Weekly Completion Trend';
+            trendHeader.appendChild(trendTitle);
+
+            var trendBody = document.createElement('div');
+            trendBody.className = 'chart-body';
+            var trendChart = document.createElement('div');
+            trendChart.className = 'trend-chart';
+
+            var maxVal = Math.max.apply(null, reportData.weeklyTrend.map(function(w) { return w.completed; }));
+            reportData.weeklyTrend.forEach(function(week) {
+                var bar = document.createElement('div');
+                bar.className = 'trend-bar';
+                bar.style.height = (week.completed / maxVal * 150) + 'px';
+
+                var label = document.createElement('div');
+                label.className = 'trend-label';
+                label.textContent = week.week;
+                bar.appendChild(label);
+
+                trendChart.appendChild(bar);
+            });
+
+            trendBody.appendChild(trendChart);
+            trendCard.appendChild(trendHeader);
+            trendCard.appendChild(trendBody);
+            grid.appendChild(trendCard);
+        }
+
+        function renderHistory() {
+            var tbody = document.getElementById('historyBody');
+            reportData.history.forEach(function(row, idx) {
+                var tr = document.createElement('tr');
+
+                var weekTd = document.createElement('td');
+                weekTd.textContent = row.week;
+
+                var completedTd = document.createElement('td');
+                var completedBadge = document.createElement('span');
+                completedBadge.className = 'status-badge status-green';
+                completedBadge.textContent = row.completed;
+                completedTd.appendChild(completedBadge);
+
+                var addedTd = document.createElement('td');
+                addedTd.textContent = row.added;
+
+                var blockedTd = document.createElement('td');
+                if (row.blocked > 2) {
+                    var blockedBadge = document.createElement('span');
+                    blockedBadge.className = 'status-badge status-red';
+                    blockedBadge.textContent = row.blocked;
+                    blockedTd.appendChild(blockedBadge);
+                } else {
+                    blockedTd.textContent = row.blocked;
+                }
+
+                var velocityTd = document.createElement('td');
+                velocityTd.textContent = row.velocity + ' pts';
+
+                var trendTd = document.createElement('td');
+                var prevVelocity = idx < reportData.history.length - 1 ? reportData.history[idx + 1].velocity : row.velocity;
+                trendTd.textContent = row.velocity > prevVelocity ? '↑' : (row.velocity < prevVelocity ? '↓' : '→');
+                trendTd.style.color = row.velocity > prevVelocity ? 'var(--success)' : (row.velocity < prevVelocity ? 'var(--danger)' : 'inherit');
+                trendTd.style.fontWeight = '600';
+
+                tr.appendChild(weekTd);
+                tr.appendChild(completedTd);
+                tr.appendChild(addedTd);
+                tr.appendChild(blockedTd);
+                tr.appendChild(velocityTd);
+                tr.appendChild(trendTd);
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+    <script src="spApi.js"></script>
+</body>
+</html>

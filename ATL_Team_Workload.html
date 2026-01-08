@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATL Integration | Team Workload</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cg-navy: #003087;
+            --cg-blue: #3b82f6;
+            --arrow-blue: #4A90D9;
+            --success: #10b981;
+            --warning: #fbbf24;
+            --danger: #ef4444;
+            --bg-light: #f9fafb;
+            --border: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --radius-sm: 4px;
+            --font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font); background: var(--bg-light); color: var(--text-primary); min-height: 100vh; }
+
+        /* Hero Header */
+        .hero-header {
+            background: linear-gradient(135deg, var(--cg-navy) 0%, #004099 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 48, 135, 0.15);
+        }
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .hero-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .hero-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        /* Navigation */
+        nav {
+            position: relative;
+            z-index: 100;
+            background: var(--cg-navy);
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 56px;
+        }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .nav-logos {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .nav-logos img {
+            height: 24px;
+            filter: brightness(0) invert(1);
+        }
+        .nav-divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(255,255,255,0.5);
+        }
+        .nav-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-link {
+            padding: 0.4rem 0.875rem;
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .nav-link:hover {
+            color: white;
+            background: rgba(255,255,255,0.12);
+            transform: translateY(-1px);
+        }
+        .nav-link.active {
+            color: white;
+            background: rgba(255,255,255,0.15);
+        }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            background: var(--arrow-blue);
+            border-radius: 1px;
+        }
+        .nav-link:focus-visible {
+            outline: 2px solid var(--arrow-blue);
+            outline-offset: 2px;
+        }
+
+        .main-content { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+        /* Team Grid */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Team Cards */
+        .team-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+        .team-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        .team-card-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: linear-gradient(to bottom, #fafbfc, white);
+        }
+        .team-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+        .team-avatar.internal { background: linear-gradient(135deg, var(--cg-blue), #2563eb); }
+        .team-avatar.external { background: linear-gradient(135deg, var(--danger), #dc2626); }
+        .team-info h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+        .team-info p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        .team-badge {
+            margin-left: auto;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-internal {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            color: var(--cg-blue);
+            border: 1px solid #bfdbfe;
+        }
+        .badge-external {
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            color: var(--danger);
+            border: 1px solid #fecaca;
+        }
+
+        .team-card-body {
+            padding: 1.5rem;
+        }
+
+        /* Workload Bar */
+        .workload-bar {
+            margin-bottom: 1.5rem;
+        }
+        .workload-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .workload-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .workload-value {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--cg-navy);
+        }
+        .workload-track {
+            height: 12px;
+            background: #e5e7eb;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .workload-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.6s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        .workload-fill.low { background: linear-gradient(90deg, var(--success), #059669); }
+        .workload-fill.medium { background: linear-gradient(90deg, var(--warning), #f59e0b); }
+        .workload-fill.high { background: linear-gradient(90deg, var(--danger), #dc2626); }
+
+        /* Task Breakdown */
+        .task-breakdown {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .task-stat {
+            text-align: center;
+            padding: 0.75rem 0.5rem;
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        .task-stat:hover {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .task-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--cg-navy), var(--cg-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .task-stat-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-top: 0.25rem;
+        }
+
+        /* Task List */
+        .task-list {
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
+        }
+        .task-list-header {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+        }
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        .task-priority {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        .priority-critical {
+            background: var(--danger);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .priority-high { background: var(--warning); }
+        .priority-normal { background: var(--cg-blue); }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        .task-name {
+            flex: 1;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        .task-due {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+            font-weight: 600;
+        }
+
+        /* Capacity Legend */
+        .capacity-legend {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding: 1.25rem 1.5rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+        }
+        .legend-dot.low { background: var(--success); }
+        .legend-dot.medium { background: var(--warning); }
+        .legend-dot.high { background: var(--danger); }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
+            background: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .team-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+        }
+        @media (max-width: 768px) {
+            .hero-header {
+                padding: 1.5rem;
+            }
+            .hero-title {
+                font-size: 1.5rem;
+            }
+            .hero-subtitle {
+                font-size: 0.875rem;
+            }
+            nav {
+                flex-direction: column;
+                height: auto;
+                padding: 1rem;
+                gap: 1rem;
+            }
+            .nav-brand {
+                width: 100%;
+                justify-content: center;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+            .capacity-legend {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .task-breakdown {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+
+        /* === TEXT OVERFLOW PROTECTION === */
+
+        /* Prevent horizontal overflow on body/containers */
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
+        /* Single-line text truncation */
+        .nav-title,
+        .pillar-name,
+        .criteria-label,
+        .metric-label,
+        .milestone-text,
+        .product-name,
+        .kpi-label,
+        .task-title,
+        .gantt-task-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Multi-line text truncation */
+        .pillar-how,
+        .task-description,
+        .description-text {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-clamp: 2;
+        }
+
+        /* Prevent card/container overflow */
+        .card,
+        .sidebar-card,
+        .gantt-row,
+        .task-row {
+            overflow: hidden;
+            max-width: 100%;
+        }
+
+        /* Word break for long values */
+        .value,
+        .metric-value,
+        .stat-value {
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="hero-content">
+            <h1 class="hero-title">Team Workload Analysis</h1>
+            <p class="hero-subtitle">Resource allocation and capacity tracking across integration teams</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-brand">
+            <div class="nav-logos">
+                <img src="/sites/PrincipalGTMStrategy-InternalUseOnly/Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/Site/Assets/transparent/ArrowTruLine.png" alt="Arrow Tru-Line">
+                <div class="nav-divider"></div>
+                <img src="/sites/PrincipalGTMStrategy-InternalUseOnly/Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/Site/Assets/transparent/Chamberlain-logo-blue.png" alt="Chamberlain Group">
+            </div>
+            <span class="nav-title">2026 Integration Plan</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Dashboard</a>
+            <a href="ATL_Project_Gantt.html" class="nav-link">Gantt</a>
+            <a href="ATL_Status_Hub.html" class="nav-link">Status</a>
+            <a href="ATL_My_Tasks.html" class="nav-link">My Tasks</a>
+            <a href="ATL_Team_Workload.html" class="nav-link active">Teams</a>
+            <a href="ATL_Reports.html" class="nav-link">Reports</a>
+            <a href="ATL_Admin.html" class="nav-link">Admin</a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+
+        <div class="capacity-legend">
+            <div class="legend-item"><div class="legend-dot low"></div><span>Under Capacity (0-70%)</span></div>
+            <div class="legend-item"><div class="legend-dot medium"></div><span>Optimal (70-90%)</span></div>
+            <div class="legend-item"><div class="legend-dot high"></div><span>Over Capacity (90%+)</span></div>
+        </div>
+
+        <div class="team-grid" id="teamGrid"></div>
+    </div>
+
+    <div class="footer">
+        ATL Integration Project | Chamberlain Group | Team Workload Analysis | <span id="footerDate"></span>
+    </div>
+
+    <script>
+        var teamData = [
+            { name: 'Tony Pusateri', initials: 'TP', role: 'Integration Lead', type: 'internal', capacity: 95, tasks: { total: 54, active: 12, blocked: 2, completed: 40 }, upcoming: [
+                { name: 'Product Catalog Launch', due: 'Mar 6', priority: 'critical' },
+                { name: 'Website Portal Deploy', due: 'Mar 6', priority: 'critical' },
+                { name: 'Dealer Portal Phase 1', due: 'Jun 5', priority: 'high' }
+            ]},
+            { name: 'Jason Evenson', initials: 'JE', role: 'Project Manager', type: 'internal', capacity: 88, tasks: { total: 53, active: 15, blocked: 3, completed: 35 }, upcoming: [
+                { name: 'Dashboard Automation', due: 'Jan 15', priority: 'high' },
+                { name: 'Reporting Foundation', due: 'Jan 30', priority: 'normal' },
+                { name: 'Weekly Cadence Review', due: 'Dec 20', priority: 'normal' }
+            ]},
+            { name: 'Ken Sittman', initials: 'KS', role: 'Finance Lead', type: 'internal', capacity: 72, tasks: { total: 13, active: 5, blocked: 1, completed: 7 }, upcoming: [
+                { name: 'Budget & Financial Planning', due: 'Dec 19', priority: 'critical' },
+                { name: 'Inventory Accuracy', due: 'Feb 15', priority: 'high' }
+            ]},
+            { name: 'Kedaresh Deshpande', initials: 'KD', role: 'Analytics', type: 'internal', capacity: 65, tasks: { total: 18, active: 4, blocked: 1, completed: 13 }, upcoming: [
+                { name: 'Lost Customer Win-Back', due: 'Jan 31', priority: 'high' },
+                { name: 'OEM Partnership Analysis', due: 'Feb 28', priority: 'normal' }
+            ]},
+            { name: 'Larry Jones', initials: 'LJ', role: 'Operations Lead', type: 'external', capacity: 92, tasks: { total: 9, active: 6, blocked: 1, completed: 2 }, upcoming: [
+                { name: 'CRU Index Pricing', due: 'Feb 1', priority: 'critical' },
+                { name: 'Margin Improvement', due: 'Mar 15', priority: 'high' }
+            ]},
+            { name: 'John McLaughlin', initials: 'JM', role: 'Sales Lead', type: 'external', capacity: 78, tasks: { total: 14, active: 5, blocked: 0, completed: 9 }, upcoming: [
+                { name: 'Product Catalog', due: 'Mar 6', priority: 'high' },
+                { name: 'Sales Transformation', due: 'Apr 15', priority: 'normal' }
+            ]},
+            { name: 'Rick Richkowski', initials: 'RR', role: 'Technical Lead', type: 'external', capacity: 85, tasks: { total: 5, active: 3, blocked: 0, completed: 2 }, upcoming: [
+                { name: 'SKU Remediation', due: 'Jan 9', priority: 'critical' }
+            ]},
+            { name: 'Tom Brockley', initials: 'TB', role: 'Executive Sponsor', type: 'external', capacity: 45, tasks: { total: 8, active: 2, blocked: 0, completed: 6 }, upcoming: [
+                { name: 'Quarterly Review', due: 'Dec 31', priority: 'high' }
+            ]}
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTeamCards();
+            updateFooterDate();
+        });
+
+        function updateFooterDate() {
+            var now = new Date();
+            var footerDate = document.getElementById('footerDate');
+            if (footerDate) {
+                footerDate.textContent = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+        }
+
+        function getCapacityClass(capacity) {
+            if (capacity >= 90) return 'high';
+            if (capacity >= 70) return 'medium';
+            return 'low';
+        }
+
+        function renderTeamCards() {
+            var grid = document.getElementById('teamGrid');
+
+            teamData.forEach(function(member) {
+                var card = document.createElement('div');
+                card.className = 'team-card';
+
+                // Header
+                var header = document.createElement('div');
+                header.className = 'team-card-header';
+
+                var avatar = document.createElement('div');
+                avatar.className = 'team-avatar ' + member.type;
+                avatar.textContent = member.initials;
+
+                var info = document.createElement('div');
+                info.className = 'team-info';
+                var name = document.createElement('h3');
+                name.textContent = member.name;
+                var role = document.createElement('p');
+                role.textContent = member.role;
+                info.appendChild(name);
+                info.appendChild(role);
+
+                var badge = document.createElement('span');
+                badge.className = 'team-badge badge-' + member.type;
+                badge.textContent = member.type === 'internal' ? 'CG' : 'ATL';
+
+                header.appendChild(avatar);
+                header.appendChild(info);
+                header.appendChild(badge);
+
+                // Body
+                var body = document.createElement('div');
+                body.className = 'team-card-body';
+
+                // Workload bar
+                var workloadBar = document.createElement('div');
+                workloadBar.className = 'workload-bar';
+
+                var workloadHeader = document.createElement('div');
+                workloadHeader.className = 'workload-header';
+                var workloadLabel = document.createElement('span');
+                workloadLabel.className = 'workload-label';
+                workloadLabel.textContent = 'Capacity';
+                var workloadValue = document.createElement('span');
+                workloadValue.className = 'workload-value';
+                workloadValue.textContent = member.capacity + '%';
+                workloadHeader.appendChild(workloadLabel);
+                workloadHeader.appendChild(workloadValue);
+
+                var workloadTrack = document.createElement('div');
+                workloadTrack.className = 'workload-track';
+                var workloadFill = document.createElement('div');
+                workloadFill.className = 'workload-fill ' + getCapacityClass(member.capacity);
+                workloadFill.style.width = member.capacity + '%';
+                workloadTrack.appendChild(workloadFill);
+
+                workloadBar.appendChild(workloadHeader);
+                workloadBar.appendChild(workloadTrack);
+
+                // Task breakdown
+                var breakdown = document.createElement('div');
+                breakdown.className = 'task-breakdown';
+
+                var stats = [
+                    { value: member.tasks.total, label: 'Total' },
+                    { value: member.tasks.active, label: 'Active' },
+                    { value: member.tasks.blocked, label: 'Blocked' },
+                    { value: member.tasks.completed, label: 'Done' }
+                ];
+
+                stats.forEach(function(stat) {
+                    var statDiv = document.createElement('div');
+                    statDiv.className = 'task-stat';
+                    var statValue = document.createElement('div');
+                    statValue.className = 'task-stat-value';
+                    statValue.textContent = stat.value;
+                    var statLabel = document.createElement('div');
+                    statLabel.className = 'task-stat-label';
+                    statLabel.textContent = stat.label;
+                    statDiv.appendChild(statValue);
+                    statDiv.appendChild(statLabel);
+                    breakdown.appendChild(statDiv);
+                });
+
+                // Upcoming tasks
+                var taskList = document.createElement('div');
+                taskList.className = 'task-list';
+                var taskHeader = document.createElement('div');
+                taskHeader.className = 'task-list-header';
+                taskHeader.textContent = 'Upcoming Tasks';
+                taskList.appendChild(taskHeader);
+
+                member.upcoming.forEach(function(task) {
+                    var taskItem = document.createElement('div');
+                    taskItem.className = 'task-item';
+
+                    var priority = document.createElement('div');
+                    priority.className = 'task-priority priority-' + task.priority;
+
+                    var taskName = document.createElement('span');
+                    taskName.className = 'task-name';
+                    taskName.textContent = task.name;
+
+                    var taskDue = document.createElement('span');
+                    taskDue.className = 'task-due';
+                    taskDue.textContent = task.due;
+
+                    taskItem.appendChild(priority);
+                    taskItem.appendChild(taskName);
+                    taskItem.appendChild(taskDue);
+                    taskList.appendChild(taskItem);
+                });
+
+                body.appendChild(workloadBar);
+                body.appendChild(breakdown);
+                body.appendChild(taskList);
+
+                card.appendChild(header);
+                card.appendChild(body);
+                grid.appendChild(card);
+            });
+        }
+    </script>
+    <script src="spApi.js"></script>
+</body>
+</html>

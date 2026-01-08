@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATL Integration | Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cg-navy: #003087;
+            --cg-navy-dark: #00256b;
+            --cg-blue: #3b82f6;
+            --arrow-blue: #4A90D9;
+            --arrow-blue-light: #6BA3E0;
+            --arrow-red: #E94E4E;
+            --bg-primary: #f9fafb;
+            --bg-white: #ffffff;
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #fbbf24;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --font: 'DM Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 16px; }
+        body {
+            font-family: var(--font);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            position: relative;
+            z-index: 100;
+            background: linear-gradient(135deg, var(--cg-navy) 0%, var(--cg-navy-dark) 100%);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            border-bottom: 3px solid var(--cg-blue);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-logos {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-logos img {
+            height: 24px;
+            filter: brightness(0) invert(1);
+        }
+
+        .nav-divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(255,255,255,0.5);
+        }
+
+        .nav-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .nav-badge {
+            background: var(--arrow-red);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link {
+            padding: 0.5rem 1rem;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-link.active {
+            color: white;
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Main Layout */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .page-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--cg-navy);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            letter-spacing: -0.5px;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Cards Grid */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .admin-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .admin-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--cg-navy) 0%, var(--cg-navy-dark) 100%);
+            color: white;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 3px solid var(--cg-blue);
+        }
+
+        .card-header-icon {
+            font-size: 1.25rem;
+        }
+
+        .card-header h2 {
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--cg-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-input.mono {
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 0.8rem;
+        }
+
+        .form-help {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--cg-navy) 0%, var(--cg-navy-dark) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 48, 135, 0.25);
+        }
+
+        .btn-secondary {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--cg-blue);
+            color: var(--cg-blue);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #d43d3d;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        /* Team List */
+        .team-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .team-member {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: var(--bg-primary);
+            border-radius: 6px;
+        }
+
+        .team-member-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .team-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--cg-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .team-avatar.external {
+            background: var(--danger);
+        }
+
+        .team-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .team-email {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .team-badge {
+            font-size: 0.65rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .badge-internal {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--cg-blue);
+        }
+
+        .badge-external {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        /* Status Indicators */
+        .status-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .status-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-dot.green { background: var(--success); }
+        .status-dot.yellow { background: var(--warning); }
+        .status-dot.red { background: var(--danger); }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .quick-action {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg-primary);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .quick-action:hover {
+            border-color: var(--cg-blue);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .quick-action-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .quick-action-arrow {
+            font-size: 1rem;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .quick-action:hover .quick-action-arrow {
+            color: var(--cg-blue);
+            transform: translateX(3px);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+
+        /* Data Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 1rem 0.75rem;
+            background: var(--cg-navy);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 3px solid var(--cg-blue);
+        }
+
+        .data-table td {
+            padding: 1rem 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table tr:hover td {
+            background: rgba(59, 130, 246, 0.03);
+        }
+
+        .flow-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .flow-active {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .flow-disabled {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        /* Section Divider */
+        .section-divider {
+            height: 1px;
+            background: var(--border-light);
+            margin: 1rem 0;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--cg-navy);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 1rem;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .data-section p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .data-section .btn-group {
+            margin-
+        }
+
+        /* Distribution Groups */
+        .distro-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .distro-table th {
+            text-align: center;
+            padding: 0.75rem 0.5rem;
+            background: var(--cg-navy);
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 3px solid var(--cg-blue);
+            white-space: nowrap;
+        }
+
+        .distro-table th:first-child {
+            text-align: left;
+            padding-left: 0.75rem;
+            min-width: 180px;
+        }
+
+        .distro-table td {
+            padding: 0.75rem 0.5rem;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .distro-table td:first-child {
+            text-align: left;
+            padding-left: 1rem;
+        }
+
+        .distro-table tr:hover td {
+            background: rgba(59, 130, 246, 0.03);
+        }
+
+        .distro-member-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .distro-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--cg-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .distro-avatar.external {
+            background: var(--danger);
+        }
+
+        .distro-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .distro-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--cg-blue);
+        }
+
+        .distro-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+        }
+
+        .distro-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+        }
+
+        .distro-legend-icon {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .legend-exec { background: var(--cg-navy); }
+        .legend-weekly { background: var(--cg-blue); }
+        .legend-blockers { background: var(--danger); }
+        .legend-milestones { background: var(--success); }
+        .legend-finance { background: var(--warning); }
+
+        .distro-section-header {
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--cg-navy);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .distro-section-header td {
+            padding: 0.75rem 1rem !important;
+            text-align: left !important;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        .distro-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .select-all-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        /* === TEXT OVERFLOW PROTECTION === */
+
+        /* Prevent horizontal overflow on body/containers */
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
+        /* Single-line text truncation */
+        .nav-title,
+        .pillar-name,
+        .criteria-label,
+        .metric-label,
+        .milestone-text,
+        .product-name,
+        .kpi-label,
+        .task-title,
+        .gantt-task-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Multi-line text truncation */
+        .pillar-how,
+        .task-description,
+        .description-text {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-clamp: 2;
+        }
+
+        /* Prevent card/container overflow */
+        .card,
+        .sidebar-card,
+        .gantt-row,
+        .task-row {
+            overflow: hidden;
+            max-width: 100%;
+        }
+
+        /* Word break for long values */
+        .value,
+        .metric-value,
+        .stat-value {
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-brand">
+            <div class="nav-logos">
+                <img src="Assets/transparent/ArrowTruLine.png" alt="Arrow Tru-Line" onerror="this.style.display='none'">
+                <div class="nav-divider"></div>
+                <img src="Assets/transparent/Chamberlain-logo-blue.png" alt="Chamberlain Group" onerror="this.style.display='none'">
+            </div>
+            <span class="nav-title">Admin</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Dashboard</a>
+            <a href="ATL_Project_Gantt.html" class="nav-link">Gantt</a>
+            <a href="ATL_Status_Hub.html" class="nav-link">Status</a>
+            <a href="ATL_My_Tasks.html" class="nav-link">My Tasks</a>
+            <a href="ATL_Team_Workload.html" class="nav-link">Teams</a>
+            <a href="ATL_Reports.html" class="nav-link">Reports</a>
+            <a href="ATL_Admin.html" class="nav-link active">Admin</a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <h1>Administration</h1>
+            <p>Configure Power Automate connections, manage team members, and monitor system status</p>
+        </div>
+
+        <div class="admin-grid">
+            <!-- API Configuration -->
+            <div class="admin-card">
+                <div class="card-header">
+                    <h2>API Configuration</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Task Update Flow URL</label>
+                        <input type="text" class="form-input mono" id="taskUpdateUrl" placeholder="https://prod-xx.westus.logic.azure.com/...">
+                        <p class="form-help">Flow14: HTTP trigger for task form submissions</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Dashboard API URL</label>
+                        <input type="text" class="form-input mono" id="dashboardApiUrl" placeholder="https://prod-xx.westus.logic.azure.com/...">
+                        <p class="form-help">Flow16: Returns dashboard metrics from SharePoint</p>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="saveConfigBtn">Save Configuration</button>
+                        <button class="btn btn-secondary" id="testConnectionsBtn">Test Connections</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Power Automate Flows -->
+            <div class="admin-card">
+                <div class="card-header">
+                    <h2>Power Automate Flows</h2>
+                </div>
+                <div class="card-body">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Flow</th>
+                                <th>Purpose</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Flow14</strong></td>
+                                <td>Task Form Submission</td>
+                                <td><span class="flow-status flow-active">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Flow15</strong></td>
+                                <td>Weekly Email Requests</td>
+                                <td><span class="flow-status flow-disabled">Disabled</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Flow16</strong></td>
+                                <td>Dashboard API</td>
+                                <td><span class="flow-status flow-active">Active</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="btn-group">
+                        <a href="https://make.powerautomate.com" target="_blank" class="btn btn-secondary">Open Power Automate</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="admin-card">
+                <div class="card-header">
+                    <h2>System Status</h2>
+                </div>
+                <div class="card-body">
+                    <div class="status-row">
+                        <span class="status-label">Task Update API</span>
+                        <span class="status-indicator" id="statusTaskApi">
+                            <span class="status-dot yellow"></span>
+                            <span class="status-text">Not Configured</span>
+                        </span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">Dashboard API</span>
+                        <span class="status-indicator" id="statusDashboardApi">
+                            <span class="status-dot yellow"></span>
+                            <span class="status-text">Not Configured</span>
+                        </span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">SharePoint Connection</span>
+                        <span class="status-indicator" id="statusSharePoint">
+                            <span class="status-dot yellow"></span>
+                            <span class="status-text">Pending</span>
+                        </span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label">Last Data Sync</span>
+                        <span class="status-indicator" id="statusLastSync">
+                            <span class="status-dot green"></span>
+                            <span class="status-text" id="lastSyncTime">--</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="admin-card">
+                <div class="card-header">
+                    <h2>Quick Actions</h2>
+                </div>
+                <div class="card-body">
+                    <div class="quick-actions">
+                        <a href="/sites/PrincipalGTMStrategy-InternalUseOnly-ATLIntegrationProject/SiteAssets/ATL-Dashboards/index.html" class="quick-action">
+                            <span class="quick-action-label">Dashboard</span>
+                            <span class="quick-action-arrow">&rarr;</span>
+                        </a>
+                        <a href="/sites/PrincipalGTMStrategy-InternalUseOnly-ATLIntegrationProject/SiteAssets/ATL-Dashboards/ATL_Project_Gantt.html" class="quick-action">
+                            <span class="quick-action-label">Gantt Chart</span>
+                            <span class="quick-action-arrow">&rarr;</span>
+                        </a>
+                        <a href="/sites/PrincipalGTMStrategy-InternalUseOnly-ATLIntegrationProject/SiteAssets/ATL-Dashboards/ATL_Task_Detail.html" class="quick-action">
+                            <span class="quick-action-label">Task Update</span>
+                            <span class="quick-action-arrow">&rarr;</span>
+                        </a>
+                        <a href="/sites/PrincipalGTMStrategy-InternalUseOnly-ATLIntegrationProject/SiteAssets/ATL-Dashboards/ATL_Admin.html" class="quick-action">
+                            <span class="quick-action-label">Live Metrics</span>
+                            <span class="quick-action-arrow">&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Distribution Groups -->
+            <div class="admin-card full-width">
+                <div class="card-header">
+                    <h2>Email Distribution Groups</h2>
+                </div>
+                <div class="card-body">
+                    <div class="distro-legend">
+                        <div class="distro-legend-item">
+                            <div class="distro-legend-icon legend-exec"></div>
+                            <span>Executive Updates - High-level project status</span>
+                        </div>
+                        <div class="distro-legend-item">
+                            <div class="distro-legend-icon legend-weekly"></div>
+                            <span>Weekly Status - Regular progress reports</span>
+                        </div>
+                        <div class="distro-legend-item">
+                            <div class="distro-legend-icon legend-blockers"></div>
+                            <span>Blocker Alerts - Immediate issue notifications</span>
+                        </div>
+                        <div class="distro-legend-item">
+                            <div class="distro-legend-icon legend-milestones"></div>
+                            <span>Milestones - Key date achievements</span>
+                        </div>
+                        <div class="distro-legend-item">
+                            <div class="distro-legend-icon legend-finance"></div>
+                            <span>Finance Updates - Budget and revenue reports</span>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="distro-table" id="distroTable">
+                            <thead>
+                                <tr>
+                                    <th>Stakeholder</th>
+                                    <th>Executive</th>
+                                    <th>Weekly</th>
+                                    <th>Blockers</th>
+                                    <th>Milestones</th>
+                                    <th>Finance</th>
+                                </tr>
+                            </thead>
+                            <tbody id="distroTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="distro-actions">
+                        <div class="select-all-group">
+                            <button class="btn btn-secondary btn-sm" id="selectAllExec">All Executive</button>
+                            <button class="btn btn-secondary btn-sm" id="selectAllWeekly">All Weekly</button>
+                            <button class="btn btn-secondary btn-sm" id="clearAllBtn">Clear All</button>
+                        </div>
+                        <button class="btn btn-primary" id="saveDistroBtn">Save Distribution Settings</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Management -->
+            <div class="admin-card full-width">
+                <div class="card-header">
+                    <h2>Data Management</h2>
+                </div>
+                <div class="card-body">
+                    <div class="data-grid">
+                        <div class="data-section">
+                            <div class="section-title">Export Data</div>
+                            <p>Download project data for reporting or backup</p>
+                            <div class="btn-group">
+                                <button class="btn btn-secondary" id="exportJsonBtn">Export JSON</button>
+                                <button class="btn btn-secondary" id="exportCsvBtn">Export CSV</button>
+                            </div>
+                        </div>
+                        <div class="data-section">
+                            <div class="section-title">SharePoint List</div>
+                            <p>Access the source SharePoint list directly</p>
+                            <a href="https://chamberlaingroup.sharepoint.com/sites/PrincipalGTMStrategy-InternalUseOnly-ATLIntegrationProject/Lists/ATL_Project_Planv21" target="_blank" class="btn btn-secondary">Open SharePoint List</a>
+                        </div>
+                        <div class="data-section">
+                            <div class="section-title">Clear Local Cache</div>
+                            <p>Reset locally stored configuration</p>
+                            <button class="btn btn-danger" id="clearCacheBtn">Clear Cache</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        var CONFIG_KEY = 'atl_admin_config';
+        var DISTRO_KEY = 'atl_distro_config';
+
+        var distroGroups = ['executive', 'weekly', 'blockers', 'milestones', 'finance'];
+
+        var teamMembers = {
+            internal: [
+                { id: 'ks', name: 'Ken Sittman', email: 'KSittman@chamberlaingroup.com', initials: 'KS' },
+                { id: 'tp', name: 'Tony Pusateri', email: 'TPusateri@chamberlaingroup.com', initials: 'TP' },
+                { id: 'st', name: 'Saket Thukral', email: 'SThukral@chamberlaingroup.com', initials: 'ST' },
+                { id: 'kd', name: 'Kedaresh Deshpande', email: 'KDeshpande@chamberlaingroup.com', initials: 'KD' },
+                { id: 'jb', name: 'Jennifer Binns', email: 'JBinns@chamberlaingroup.com', initials: 'JB' },
+                { id: 'kf', name: 'Kiel Fitzgerald', email: 'KFitzgerald@chamberlaingroup.com', initials: 'KF' },
+                { id: 'jh', name: 'Justin Hubschman', email: 'JHubschman@chamberlaingroup.com', initials: 'JH' }
+            ],
+            external: [
+                { id: 'tb', name: 'Tom Brockley', email: 'TBrockley@arrowtruline.com', initials: 'TB' },
+                { id: 'lj', name: 'Larry Jones', email: 'LJones@arrowtruline.com', initials: 'LJ' },
+                { id: 'jm', name: 'John McLaughlin', email: 'JMcLaughlin@arrowtruline.com', initials: 'JM' },
+                { id: 'rr', name: 'Rick Richkowski', email: 'RRichkowski@arrowtruline.com', initials: 'RR' },
+                { id: 'ns', name: 'Nicholas Schwiebert', email: 'NSchwiebert@arrowtruline.com', initials: 'NS' }
+            ]
+        };
+
+        var distroAssignments = {};
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadConfig();
+            loadDistroConfig();
+            renderDistroTable();
+            updateLastSyncTime();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('saveConfigBtn').addEventListener('click', saveApiConfig);
+            document.getElementById('testConnectionsBtn').addEventListener('click', testConnections);
+            document.getElementById('exportJsonBtn').addEventListener('click', function() { exportData('json'); });
+            document.getElementById('exportCsvBtn').addEventListener('click', function() { exportData('csv'); });
+            document.getElementById('clearCacheBtn').addEventListener('click', clearCache);
+            document.getElementById('saveDistroBtn').addEventListener('click', saveDistroConfig);
+            document.getElementById('selectAllExec').addEventListener('click', function() { selectAllGroup('executive'); });
+            document.getElementById('selectAllWeekly').addEventListener('click', function() { selectAllGroup('weekly'); });
+            document.getElementById('clearAllBtn').addEventListener('click', clearAllDistro);
+        }
+
+        function loadConfig() {
+            var config = localStorage.getItem(CONFIG_KEY);
+            if (config) {
+                config = JSON.parse(config);
+                document.getElementById('taskUpdateUrl').value = config.taskUpdateUrl || '';
+                document.getElementById('dashboardApiUrl').value = config.dashboardApiUrl || '';
+                updateStatusIndicators(config);
+            }
+        }
+
+        function saveApiConfig() {
+            var config = {
+                taskUpdateUrl: document.getElementById('taskUpdateUrl').value.trim(),
+                dashboardApiUrl: document.getElementById('dashboardApiUrl').value.trim(),
+                savedAt: new Date().toISOString()
+            };
+            localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+            updateStatusIndicators(config);
+            showToast('Configuration saved successfully!', 'success');
+        }
+
+        function updateStatusIndicators(config) {
+            var taskApiIndicator = document.getElementById('statusTaskApi');
+            var dashboardApiIndicator = document.getElementById('statusDashboardApi');
+
+            var taskDot = taskApiIndicator.querySelector('.status-dot');
+            var taskText = taskApiIndicator.querySelector('.status-text');
+            var dashDot = dashboardApiIndicator.querySelector('.status-dot');
+            var dashText = dashboardApiIndicator.querySelector('.status-text');
+
+            if (config.taskUpdateUrl) {
+                taskDot.className = 'status-dot green';
+                taskText.textContent = 'Configured';
+            } else {
+                taskDot.className = 'status-dot yellow';
+                taskText.textContent = 'Not Configured';
+            }
+
+            if (config.dashboardApiUrl) {
+                dashDot.className = 'status-dot green';
+                dashText.textContent = 'Configured';
+            } else {
+                dashDot.className = 'status-dot yellow';
+                dashText.textContent = 'Not Configured';
+            }
+        }
+
+        function testConnections() {
+            var config = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}');
+            var tests = [];
+
+            if (config.taskUpdateUrl) {
+                tests.push(
+                    fetch(config.taskUpdateUrl, { method: 'OPTIONS' })
+                        .then(function() { return { name: 'Task Update API', success: true }; })
+                        .catch(function() { return { name: 'Task Update API', success: false }; })
+                );
+            }
+
+            if (config.dashboardApiUrl) {
+                tests.push(
+                    fetch(config.dashboardApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{"action":"test"}' })
+                        .then(function(r) { return { name: 'Dashboard API', success: r.ok }; })
+                        .catch(function() { return { name: 'Dashboard API', success: false }; })
+                );
+            }
+
+            if (tests.length === 0) {
+                showToast('No URLs configured to test', 'error');
+                return;
+            }
+
+            Promise.all(tests).then(function(results) {
+                var passed = results.filter(function(r) { return r.success; }).length;
+                var total = results.length;
+                if (passed === total) {
+                    showToast('All connections successful! (' + passed + '/' + total + ')', 'success');
+                } else {
+                    showToast('Some connections failed (' + passed + '/' + total + ' passed)', 'error');
+                }
+            });
+        }
+
+        function loadDistroConfig() {
+            var saved = localStorage.getItem(DISTRO_KEY);
+            if (saved) {
+                distroAssignments = JSON.parse(saved);
+            } else {
+                initDefaultDistro();
+            }
+        }
+
+        function initDefaultDistro() {
+            var allMembers = teamMembers.internal.concat(teamMembers.external);
+            allMembers.forEach(function(member) {
+                distroAssignments[member.id] = {
+                    executive: false,
+                    weekly: true,
+                    blockers: false,
+                    milestones: true,
+                    finance: false
+                };
+            });
+            // Set some sensible defaults
+            distroAssignments['ks'].executive = true;
+            distroAssignments['ks'].finance = true;
+            distroAssignments['tp'].executive = true;
+            distroAssignments['tp'].blockers = true;
+            distroAssignments['tb'].executive = true;
+            distroAssignments['lj'].finance = true;
+        }
+
+        function saveDistroConfig() {
+            var allMembers = teamMembers.internal.concat(teamMembers.external);
+            allMembers.forEach(function(member) {
+                distroGroups.forEach(function(group) {
+                    var checkbox = document.getElementById('distro-' + member.id + '-' + group);
+                    if (checkbox) {
+                        if (!distroAssignments[member.id]) {
+                            distroAssignments[member.id] = {};
+                        }
+                        distroAssignments[member.id][group] = checkbox.checked;
+                    }
+                });
+            });
+            localStorage.setItem(DISTRO_KEY, JSON.stringify(distroAssignments));
+            showToast('Distribution settings saved!', 'success');
+        }
+
+        function selectAllGroup(group) {
+            var checkboxes = document.querySelectorAll('input[data-group="' + group + '"]');
+            var allChecked = true;
+            checkboxes.forEach(function(cb) {
+                if (!cb.checked) allChecked = false;
+            });
+            checkboxes.forEach(function(cb) {
+                cb.checked = !allChecked;
+            });
+        }
+
+        function clearAllDistro() {
+            var checkboxes = document.querySelectorAll('.distro-checkbox');
+            checkboxes.forEach(function(cb) {
+                cb.checked = false;
+            });
+            showToast('All selections cleared', 'success');
+        }
+
+        function createDistroRow(member, isExternal) {
+            var tr = document.createElement('tr');
+
+            // Name cell
+            var nameCell = document.createElement('td');
+            var memberDiv = document.createElement('div');
+            memberDiv.className = 'distro-member-cell';
+
+            var avatar = document.createElement('div');
+            avatar.className = 'distro-avatar' + (isExternal ? ' external' : '');
+            avatar.textContent = member.initials;
+
+            var nameSpan = document.createElement('span');
+            nameSpan.className = 'distro-name';
+            nameSpan.textContent = member.name;
+
+            memberDiv.appendChild(avatar);
+            memberDiv.appendChild(nameSpan);
+            nameCell.appendChild(memberDiv);
+            tr.appendChild(nameCell);
+
+            // Checkbox cells for each group
+            distroGroups.forEach(function(group) {
+                var td = document.createElement('td');
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'distro-checkbox';
+                checkbox.id = 'distro-' + member.id + '-' + group;
+                checkbox.setAttribute('data-member', member.id);
+                checkbox.setAttribute('data-group', group);
+
+                if (distroAssignments[member.id] && distroAssignments[member.id][group]) {
+                    checkbox.checked = true;
+                }
+
+                td.appendChild(checkbox);
+                tr.appendChild(td);
+            });
+
+            return tr;
+        }
+
+        function createSectionHeader(label) {
+            var tr = document.createElement('tr');
+            tr.className = 'distro-section-header';
+            var td = document.createElement('td');
+            td.setAttribute('colspan', '6');
+            td.textContent = label;
+            tr.appendChild(td);
+            return tr;
+        }
+
+        function renderDistroTable() {
+            var tbody = document.getElementById('distroTableBody');
+            while (tbody.firstChild) {
+                tbody.removeChild(tbody.firstChild);
+            }
+
+            // Internal members section
+            tbody.appendChild(createSectionHeader('Chamberlain Group (Internal)'));
+            teamMembers.internal.forEach(function(member) {
+                tbody.appendChild(createDistroRow(member, false));
+            });
+
+            // External members section
+            tbody.appendChild(createSectionHeader('Arrow Tru-Line (External)'));
+            teamMembers.external.forEach(function(member) {
+                tbody.appendChild(createDistroRow(member, true));
+            });
+        }
+
+        function updateLastSyncTime() {
+            var now = new Date();
+            document.getElementById('lastSyncTime').textContent = now.toLocaleString();
+        }
+
+        function exportData(format) {
+            var config = JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}');
+
+            var exportObj = {
+                exportedAt: new Date().toISOString(),
+                configuration: config,
+                teamMembers: teamMembers,
+                distributionGroups: distroAssignments
+            };
+
+            if (format === 'json') {
+                var blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
+                downloadBlob(blob, 'atl_config_export.json');
+            } else if (format === 'csv') {
+                var csv = 'Type,Name,Email,Executive,Weekly,Blockers,Milestones,Finance\n';
+                teamMembers.internal.forEach(function(m) {
+                    var d = distroAssignments[m.id] || {};
+                    csv += 'Internal,' + m.name + ',' + m.email + ',' +
+                           (d.executive ? 'Yes' : 'No') + ',' +
+                           (d.weekly ? 'Yes' : 'No') + ',' +
+                           (d.blockers ? 'Yes' : 'No') + ',' +
+                           (d.milestones ? 'Yes' : 'No') + ',' +
+                           (d.finance ? 'Yes' : 'No') + '\n';
+                });
+                teamMembers.external.forEach(function(m) {
+                    var d = distroAssignments[m.id] || {};
+                    csv += 'External,' + m.name + ',' + m.email + ',' +
+                           (d.executive ? 'Yes' : 'No') + ',' +
+                           (d.weekly ? 'Yes' : 'No') + ',' +
+                           (d.blockers ? 'Yes' : 'No') + ',' +
+                           (d.milestones ? 'Yes' : 'No') + ',' +
+                           (d.finance ? 'Yes' : 'No') + '\n';
+                });
+                var blob = new Blob([csv], { type: 'text/csv' });
+                downloadBlob(blob, 'atl_distro_export.csv');
+            }
+
+            showToast('Export downloaded!', 'success');
+        }
+
+        function downloadBlob(blob, filename) {
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function clearCache() {
+            if (confirm('Are you sure you want to clear all locally stored configuration?')) {
+                localStorage.removeItem(CONFIG_KEY);
+                document.getElementById('taskUpdateUrl').value = '';
+                document.getElementById('dashboardApiUrl').value = '';
+                updateStatusIndicators({});
+                showToast('Cache cleared', 'success');
+            }
+        }
+
+        function showToast(message, type) {
+            var toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + (type || 'success') + ' show';
+            setTimeout(function() { toast.classList.remove('show'); }, 3000);
+        }
+    </script>
+    <script src="spApi.js"></script>
+</body>
+</html>

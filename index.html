@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arrow Tru-Line | 2026 Integration Plan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Brand Colors - Executive Palette */
+            --cg-navy: #003087;
+            --cg-blue: #3b82f6;
+            --cg-green: #10b981;
+            --cg-red: #ef4444;
+            --cg-gold: #fbbf24;
+            --cg-purple: #8b5cf6;
+
+            /* Backgrounds */
+            --bg-primary: #f9fafb;
+            --bg-white: #ffffff;
+
+            /* Borders */
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+
+            /* Text */
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+
+            /* Status Colors */
+            --success: #10b981;
+            --warning: #fbbf24;
+            --danger: #ef4444;
+
+            /* Design Tokens */
+            --radius: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.15);
+
+            /* Typography */
+            --font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 16px; scroll-behavior: smooth; }
+        body {
+            font-family: var(--font);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* Navigation */
+        nav {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            border-bottom: 3px solid var(--cg-navy);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-logos {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-logos img {
+            height: 24px;
+        }
+
+        .nav-divider {
+            width: 1px;
+            height: 20px;
+            background: var(--border);
+        }
+
+        .nav-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--cg-navy);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link {
+            padding: 0.5rem 1rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: var(--bg-primary);
+            border-color: var(--border);
+        }
+
+        .nav-link.active {
+            background: var(--cg-navy);
+            color: white;
+            border-color: var(--cg-navy);
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, var(--cg-navy) 0%, #00256b 100%);
+            padding: 2rem;
+            color: white;
+            border-bottom: 3px solid var(--cg-blue);
+        }
+
+        .hero-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .hero-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-title-block h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .hero-title-block p {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.75);
+        }
+
+        /* KPI Strip */
+        .kpi-strip {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 1rem;
+        }
+
+        .kpi-item {
+            background: rgba(255,255,255,0.1);
+            padding: 1.25rem;
+            text-align: center;
+            border-radius: var(--radius);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .kpi-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .kpi-value.highlight { color: var(--cg-gold); }
+        .kpi-value.green { color: #6ee7b7; }
+
+        .kpi-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .kpi-delta {
+            font-size: 0.7rem;
+            color: #6ee7b7;
+            margin-top: 0.25rem;
+        }
+
+        /* Phase Timeline - Below Hero */
+        .phase-strip {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 2rem;
+        }
+
+        .phase-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .phase-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .phase-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        .phase-dates {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .phase-track {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+        }
+
+        .phase-node {
+            background: var(--bg-primary);
+            border-radius: var(--radius);
+            padding: 1rem;
+            border-left: 4px solid var(--border);
+        }
+
+        .phase-node.active {
+            border-left-color: var(--cg-blue);
+            background: #eff6ff;
+        }
+
+        .phase-marker-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .phase-num {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--cg-navy);
+        }
+
+        .phase-pct {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .phase-node.active .phase-pct {
+            color: var(--cg-blue);
+        }
+
+        .phase-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .phase-range {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        /* Main Left Column */
+        .main-left {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Pillar Cards */
+        .pillar-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        /* Success Criteria */
+        .criteria-section {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .criteria-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--cg-navy);
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--cg-blue);
+        }
+
+        .criteria-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .criteria-item {
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: var(--radius);
+            border-left: 4px solid var(--border);
+        }
+
+        .criteria-item.on-track { border-left-color: var(--cg-green); }
+        .criteria-item.at-risk { border-left-color: var(--cg-gold); }
+
+        .criteria-target {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--cg-navy);
+            margin-bottom: 0.25rem;
+        }
+
+        .criteria-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .criteria-status {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .criteria-status.green {
+            background: var(--cg-green);
+            color: white;
+        }
+
+        .criteria-status.yellow {
+            background: var(--cg-gold);
+            color: white;
+        }
+
+        /* Status Overview */
+        .status-section {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .status-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--cg-navy);
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--cg-blue);
+        }
+
+        .status-bar-wrap {
+            display: flex;
+            height: 28px;
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .status-segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+            transition: width 0.5s ease;
+        }
+
+        .status-segment.complete { background: var(--cg-green); }
+        .status-segment.on-track { background: var(--cg-blue); }
+        .status-segment.at-risk { background: var(--cg-gold); }
+        .status-segment.blocked { background: var(--cg-red); }
+        .status-segment.not-started { background: #9ca3af; }
+
+        .status-legend {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .status-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+
+        .status-dot.complete { background: var(--cg-green); }
+        .status-dot.on-track { background: var(--cg-blue); }
+        .status-dot.at-risk { background: var(--cg-gold); }
+        .status-dot.blocked { background: var(--cg-red); }
+        .status-dot.not-started { background: #9ca3af; }
+
+        .status-legend-text {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .status-legend-count {
+            font-weight: 700;
+            color: var(--cg-navy);
+        }
+
+        .pillar-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border-left: 4px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .pillar-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .pillar-card.p1 { border-left-color: var(--cg-navy); }
+        .pillar-card.p2 { border-left-color: var(--cg-blue); }
+        .pillar-card.p3 { border-left-color: var(--cg-green); }
+        .pillar-card.p4 { border-left-color: var(--cg-red); }
+
+        .pillar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .pillar-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--cg-navy);
+        }
+
+        .pillar-potential {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--cg-navy);
+        }
+
+        .pillar-how {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .pillar-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .pillar-stat {
+            text-align: center;
+        }
+
+        .pillar-stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--cg-navy);
+        }
+
+        .pillar-stat-value.green { color: var(--cg-green); }
+
+        .pillar-stat-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sidebar-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--cg-navy);
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--cg-blue);
+        }
+
+        /* Product Mix */
+        .product-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .product-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .product-bar-wrap {
+            flex: 1;
+            height: 28px;
+            background: var(--bg-primary);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .product-bar {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0 0.75rem;
+            min-width: 60px;
+        }
+
+        .product-bar-value {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .product-name {
+            width: 110px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Key Metrics */
+        .metric-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .metric-value {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .metric-value.green { color: var(--success); }
+
+        /* Milestones */
+        .milestone-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .milestone-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            background: var(--bg-primary);
+            border-radius: 6px;
+        }
+
+        .milestone-date {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            width: 50px;
+        }
+
+        .milestone-text {
+            flex: 1;
+            font-size: 0.8rem;
+            color: var(--text-primary);
+        }
+
+        .milestone-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border);
+        }
+
+        .milestone-status.on-track { background: var(--cg-green); }
+        .milestone-status.at-risk { background: var(--cg-gold); }
+
+        /* Project Folders */
+        .folder-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .folder-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg-primary);
+            border-radius: var(--radius);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .folder-link:hover {
+            background: #eff6ff;
+            border-color: var(--cg-blue);
+        }
+
+        .folder-link.view-all {
+            background: var(--cg-navy);
+            color: white;
+        }
+
+        .folder-link.view-all:hover {
+            background: #00256b;
+        }
+
+        .folder-link.view-all .folder-icon,
+        .folder-link.view-all .folder-name,
+        .folder-link.view-all .folder-arrow {
+            color: white;
+        }
+
+        .folder-icon {
+            font-size: 1rem;
+            color: var(--cg-gold);
+        }
+
+        .folder-name {
+            flex: 1;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .folder-arrow {
+            font-size: 0.85rem;
+            color: var(--cg-blue);
+        }
+
+        /* Quick Links */
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .quick-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .quick-link:hover {
+            border-color: var(--cg-blue);
+            box-shadow: var(--shadow-md);
+        }
+
+        .quick-link-text {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--cg-navy);
+        }
+
+        .quick-link-arrow {
+            font-size: 1rem;
+            color: var(--cg-blue);
+        }
+
+        /* Footer */
+        footer {
+            padding: 1.5rem 2rem;
+            background: var(--bg-white);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .footer-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-status .live-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--cg-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .data-timestamp {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Loading State */
+        .loading-shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .kpi-strip { grid-template-columns: repeat(3, 1fr); }
+            .content-grid { grid-template-columns: 1fr; }
+            .criteria-grid { grid-template-columns: repeat(2, 1fr); }
+            .quick-links { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+            .pillar-section { grid-template-columns: 1fr; }
+            .phase-track { grid-template-columns: 1fr; }
+            .criteria-grid { grid-template-columns: 1fr; }
+            .quick-links { grid-template-columns: 1fr; }
+            nav { padding: 1rem; }
+            .nav-brand { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+        }
+
+        /* Text Overflow Protection */
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
+        .nav-title, .pillar-name, .criteria-label, .metric-label,
+        .milestone-text, .product-name, .kpi-label {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .pillar-how {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .card, .sidebar-card {
+            overflow: hidden;
+            max-width: 100%;
+        }
+
+        .value, .metric-value, .stat-value {
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-brand">
+            <div class="nav-logos">
+                <img src="Assets/transparent/ArrowTruLine.png" alt="Arrow Tru-Line" style="height: 22px;">
+                <div class="nav-divider"></div>
+                <img src="Assets/transparent/Chamberlain-logo-blue.png" alt="Chamberlain Group" style="height: 18px;">
+            </div>
+            <span class="nav-title">2026 Integration Plan</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link active">Dashboard</a>
+            <a href="ATL_Project_Gantt.html" class="nav-link">Gantt</a>
+            <a href="ATL_Status_Hub.html" class="nav-link">Status</a>
+            <a href="ATL_My_Tasks.html" class="nav-link">My Tasks</a>
+            <a href="ATL_Team_Workload.html" class="nav-link">Teams</a>
+            <a href="ATL_Reports.html" class="nav-link">Reports</a>
+            <a href="ATL_Admin.html" class="nav-link">Admin</a>
+        </div>
+    </nav>
+
+    <!-- Hero: Key Financial Metrics -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-header">
+                <div class="hero-title-block">
+                    <h1>Arrow Tru-Line Strategic Transformation</h1>
+                    <p>FY2026 Integration Plan | Revenue Growth Strategy</p>
+                </div>
+            </div>
+
+            <div class="kpi-strip">
+                <div class="kpi-item">
+                    <div class="kpi-value">$167.5M</div>
+                    <div class="kpi-label">2025 Forecast</div>
+                </div>
+                <div class="kpi-item">
+                    <div class="kpi-value green">$180M</div>
+                    <div class="kpi-label">2026 Commit</div>
+                    <div class="kpi-delta">+7% YoY</div>
+                </div>
+                <div class="kpi-item">
+                    <div class="kpi-value highlight">$190M</div>
+                    <div class="kpi-label">2026 Stretch</div>
+                    <div class="kpi-delta">+13% YoY</div>
+                </div>
+                <div class="kpi-item">
+                    <div class="kpi-value">$32.5M</div>
+                    <div class="kpi-label">Incremental</div>
+                    <div class="kpi-delta">4 Pillars</div>
+                </div>
+                <div class="kpi-item">
+                    <div class="kpi-value">29.5%</div>
+                    <div class="kpi-label">Gross Margin</div>
+                    <div class="kpi-delta">Flat YoY</div>
+                </div>
+                <div class="kpi-item">
+                    <div class="kpi-value">15%</div>
+                    <div class="kpi-label">Market Share</div>
+                    <div class="kpi-delta">525k tons</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Phase Timeline Strip -->
+    <section class="phase-strip">
+        <div class="phase-container">
+            <div class="phase-header">
+                <span class="phase-title">Integration Phases</span>
+                <span class="phase-dates">Jan 2026 - Dec 2026</span>
+            </div>
+            <div class="phase-track" id="phaseTrack">
+                <!-- Rendered by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="main-container">
+        <div class="content-grid">
+            <!-- Left: Main Content -->
+            <div class="main-left">
+                <!-- Success Criteria -->
+                <div class="criteria-section">
+                    <div class="criteria-title">What Must Be True for Success</div>
+                    <div class="criteria-grid">
+                        <div class="criteria-item on-track">
+                            <div class="criteria-target">$180M</div>
+                            <div class="criteria-label">Net Sales (+7% YoY)</div>
+                            <span class="criteria-status green">On Track</span>
+                        </div>
+                        <div class="criteria-item on-track">
+                            <div class="criteria-target">27.8%</div>
+                            <div class="criteria-label">Gross Margin (Flat YoY)</div>
+                            <span class="criteria-status green">On Track</span>
+                        </div>
+                        <div class="criteria-item on-track">
+                            <div class="criteria-target">21.5%</div>
+                            <div class="criteria-label">EBITDA Margin</div>
+                            <span class="criteria-status green">On Track</span>
+                        </div>
+                        <div class="criteria-item on-track">
+                            <div class="criteria-target">15%</div>
+                            <div class="criteria-label">Market Share (Flat YoY)</div>
+                            <span class="criteria-status green">On Track</span>
+                        </div>
+                        <div class="criteria-item on-track">
+                            <div class="criteria-target">525k</div>
+                            <div class="criteria-label">Tons Market Size</div>
+                            <span class="criteria-status green">Baseline</span>
+                        </div>
+                        <div class="criteria-item on-track">
+                            <div class="criteria-target">74.5k</div>
+                            <div class="criteria-label">Tons ATL Shipments</div>
+                            <span class="criteria-status green">Target</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task Status Overview - LIVE DATA -->
+                <div class="status-section">
+                    <div class="status-title">Project Task Status</div>
+                    <div class="status-bar-wrap" id="statusBar">
+                        <!-- Rendered by JavaScript from SharePoint -->
+                    </div>
+                    <div class="status-legend" id="statusLegend">
+                        <!-- Rendered by JavaScript from SharePoint -->
+                    </div>
+                </div>
+
+                <!-- Pillar Cards -->
+                <div class="pillar-section" id="pillarSection">
+                    <!-- Rendered by JavaScript from SharePoint -->
+                </div>
+            </div>
+
+            <!-- Right: Sidebar -->
+            <div class="sidebar">
+                <!-- Product Mix -->
+                <div class="sidebar-card">
+                    <div class="sidebar-title">Revenue by Product</div>
+                    <div class="product-list">
+                        <div class="product-row">
+                            <div class="product-bar-wrap">
+                                <div class="product-bar" style="width: 75%; background: var(--cg-navy);">
+                                    <span class="product-bar-value">$12.4M</span>
+                                </div>
+                            </div>
+                            <span class="product-name">Torsion Tubes</span>
+                        </div>
+                        <div class="product-row">
+                            <div class="product-bar-wrap">
+                                <div class="product-bar" style="width: 44%; background: var(--cg-blue);">
+                                    <span class="product-bar-value">$7.2M</span>
+                                </div>
+                            </div>
+                            <span class="product-name">Springs</span>
+                        </div>
+                        <div class="product-row">
+                            <div class="product-bar-wrap">
+                                <div class="product-bar" style="width: 35%; background: var(--cg-green);">
+                                    <span class="product-bar-value">$5.8M</span>
+                                </div>
+                            </div>
+                            <span class="product-name">Tracks</span>
+                        </div>
+                        <div class="product-row">
+                            <div class="product-bar-wrap">
+                                <div class="product-bar" style="width: 27%; background: var(--cg-gold);">
+                                    <span class="product-bar-value">$4.5M</span>
+                                </div>
+                            </div>
+                            <span class="product-name">Hardware</span>
+                        </div>
+                        <div class="product-row">
+                            <div class="product-bar-wrap">
+                                <div class="product-bar" style="width: 16%; background: var(--cg-purple);">
+                                    <span class="product-bar-value">$2.6M</span>
+                                </div>
+                            </div>
+                            <span class="product-name">Other</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Metrics - LIVE DATA -->
+                <div class="sidebar-card">
+                    <div class="sidebar-title">Key Metrics</div>
+                    <div class="metric-list" id="keyMetrics">
+                        <!-- Rendered by JavaScript from SharePoint -->
+                    </div>
+                </div>
+
+                <!-- Upcoming Milestones -->
+                <div class="sidebar-card">
+                    <div class="sidebar-title">Upcoming Milestones</div>
+                    <div class="milestone-list" id="milestoneList">
+                        <!-- Rendered by JavaScript from SharePoint -->
+                    </div>
+                </div>
+
+                <!-- Project Folders -->
+                <div class="sidebar-card">
+                    <div class="sidebar-title">Project Folders</div>
+                    <div class="folder-list">
+                        <a href="../../../Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/Project%20Plan" class="folder-link">
+                            <span class="folder-icon">&#128193;</span>
+                            <span class="folder-name">Project Plan</span>
+                            <span class="folder-arrow">&rarr;</span>
+                        </a>
+                        <a href="../../../Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/PMO%20Office" class="folder-link">
+                            <span class="folder-icon">&#128193;</span>
+                            <span class="folder-name">PMO Office</span>
+                            <span class="folder-arrow">&rarr;</span>
+                        </a>
+                        <a href="../../../Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/Financials%20-%20ATL%20Enterprise" class="folder-link">
+                            <span class="folder-icon">&#128193;</span>
+                            <span class="folder-name">Financials</span>
+                            <span class="folder-arrow">&rarr;</span>
+                        </a>
+                        <a href="../../../Shared%20Documents/Forms/AllItems.aspx" class="folder-link view-all">
+                            <span class="folder-icon">&#128194;</span>
+                            <span class="folder-name">View All Documents</span>
+                            <span class="folder-arrow">&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-links">
+            <a href="ATL_Project_Gantt.html" class="quick-link">
+                <span class="quick-link-text">Gantt Chart</span>
+                <span class="quick-link-arrow">&rarr;</span>
+            </a>
+            <a href="ATL_Task_Detail.html" class="quick-link">
+                <span class="quick-link-text">Task Update</span>
+                <span class="quick-link-arrow">&rarr;</span>
+            </a>
+            <a href="ATL_Budget_Tracker.html" class="quick-link">
+                <span class="quick-link-text">Budget Tracker</span>
+                <span class="quick-link-arrow">&rarr;</span>
+            </a>
+            <a href="ATL_Blocker_Dashboard.html" class="quick-link">
+                <span class="quick-link-text">Blockers</span>
+                <span class="quick-link-arrow">&rarr;</span>
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <div>ATL Integration Project | Chamberlain Group | Jason Evenson</div>
+        <div class="data-timestamp" id="dataTimestamp">Loading data...</div>
+    </footer>
+
+    <!-- SharePoint REST API Helper -->
+    <script src="spApi.js"></script>
+
+    <script>
+        // ============================================================
+        // Dashboard Data Loader
+        // ============================================================
+
+        // Fallback data for offline/error states
+        var fallbackData = {
+            statusCounts: { complete: 14, onTrack: 77, atRisk: 21, blocked: 9, notStarted: 51 },
+            phases: [
+                { num: 1, name: 'Stabilization', range: 'Jan - Feb', pct: 15, active: true },
+                { num: 2, name: 'Foundation', range: 'Mar - Apr', pct: 0, active: false },
+                { num: 3, name: 'Acceleration', range: 'May - Jul', pct: 0, active: false },
+                { num: 4, name: 'Optimization', range: 'Aug - Oct', pct: 0, active: false },
+                { num: 5, name: 'Completion', range: 'Nov - Dec', pct: 0, active: false }
+            ],
+            pillars: [
+                { name: 'Expand Product Share', potential: '$12M', budget: '$9M', tasks: 38, critical: 19, how: 'Torsion Tubes Share Gain (Amarr, CHI, Haas)', class: 'p1' },
+                { name: 'CG GTM Synergy', potential: '$8.5M', budget: '$6M', tasks: 30, critical: 12, how: 'CPSG conversion, LiftMaster partner leverage', class: 'p2' },
+                { name: 'Incremental Pipeline', potential: '$6M', budget: '$3M', tasks: 86, critical: 15, how: 'Haas, Raynor Trailer, Midland segments', class: 'p3' },
+                { name: 'Regaining Lost Business', potential: '$6M', budget: '$4.5M', tasks: 18, critical: 5, how: 'Link Rail, down accounts (Clopay, Amarr, Pro Door)', class: 'p4' }
+            ],
+            milestones: [
+                { date: 'Dec 19', text: 'Budget Finalization', status: 'at-risk' },
+                { date: 'Jan 15', text: 'SKU Remediation Start', status: 'on-track' },
+                { date: 'Feb 01', text: 'Product Catalog Launch', status: 'on-track' },
+                { date: 'Mar 15', text: 'Dealer Portal Beta', status: '' }
+            ]
+        };
+
+        // Current data (loaded from SharePoint or fallback)
+        var dashboardData = null;
+        var dataSource = 'loading';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initDashboard();
+        });
+
+        function initDashboard() {
+            // Show loading state
+            showLoadingState();
+
+            // Try to load from SharePoint REST API
+            loadFromSharePoint()
+                .then(function(data) {
+                    dashboardData = data;
+                    dataSource = 'sharepoint';
+                    renderDashboard();
+                })
+                .catch(function(error) {
+                    spApi.log('warn', 'SharePoint load failed, using fallback data', error.message);
+                    dashboardData = fallbackData;
+                    dataSource = 'fallback';
+                    renderDashboard();
+                });
+        }
+
+        function showLoadingState() {
+            // Add loading shimmer to dynamic sections
+            var statusBar = document.getElementById('statusBar');
+            var loadingDiv = document.createElement('div');
+            loadingDiv.className = 'loading-shimmer';
+            loadingDiv.style.cssText = 'width: 100%; height: 28px; border-radius: 8px;';
+            statusBar.appendChild(loadingDiv);
+        }
+
+        function loadFromSharePoint() {
+            return spApi.getTasks({
+                select: 'Id,Title,Phase,Status,Priority,DueDate,Workstream',
+                top: 500
+            }).then(function(tasks) {
+                // Calculate status counts from live data
+                var statusCounts = {
+                    complete: 0,
+                    onTrack: 0,
+                    atRisk: 0,
+                    blocked: 0,
+                    notStarted: 0
+                };
+
+                var phaseCounts = {};
+                var phaseComplete = {};
+                var workstreamCounts = {};
+
+                tasks.forEach(function(task) {
+                    // Count by status
+                    var status = (task.Status || '').toLowerCase();
+                    if (status === 'complete' || status === 'completed') {
+                        statusCounts.complete++;
+                    } else if (status === 'on track' || status === 'in progress') {
+                        statusCounts.onTrack++;
+                    } else if (status === 'at risk') {
+                        statusCounts.atRisk++;
+                    } else if (status === 'blocked') {
+                        statusCounts.blocked++;
+                    } else {
+                        statusCounts.notStarted++;
+                    }
+
+                    // Count by phase
+                    var phase = task.Phase || 'Unknown';
+                    phaseCounts[phase] = (phaseCounts[phase] || 0) + 1;
+                    if (status === 'complete' || status === 'completed') {
+                        phaseComplete[phase] = (phaseComplete[phase] || 0) + 1;
+                    }
+
+                    // Count by workstream
+                    var ws = task.Workstream || 'Other';
+                    workstreamCounts[ws] = (workstreamCounts[ws] || 0) + 1;
+                });
+
+                // Build phases with calculated percentages
+                var phases = fallbackData.phases.map(function(p) {
+                    var phaseName = 'Phase ' + p.num;
+                    var total = phaseCounts[phaseName] || 0;
+                    var complete = phaseComplete[phaseName] || 0;
+                    var pct = total > 0 ? Math.round((complete / total) * 100) : 0;
+                    return Object.assign({}, p, { pct: pct, active: pct > 0 && pct < 100 });
+                });
+
+                // Mark first incomplete phase as active
+                var foundActive = false;
+                phases.forEach(function(p) {
+                    if (!foundActive && p.pct < 100) {
+                        p.active = true;
+                        foundActive = true;
+                    } else if (p.pct < 100) {
+                        p.active = false;
+                    }
+                });
+
+                return {
+                    statusCounts: statusCounts,
+                    phases: phases,
+                    pillars: fallbackData.pillars, // Keep static for now
+                    milestones: fallbackData.milestones, // Keep static for now
+                    totalTasks: tasks.length,
+                    lastModified: new Date()
+                };
+            });
+        }
+
+        function renderDashboard() {
+            renderPhases();
+            renderStatusBar();
+            renderKeyMetrics();
+            renderPillars();
+            renderMilestones();
+            updateTimestamp();
+        }
+
+        function renderPhases() {
+            var container = document.getElementById('phaseTrack');
+            // Clear existing
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+
+            dashboardData.phases.forEach(function(phase) {
+                var node = document.createElement('div');
+                node.className = 'phase-node' + (phase.active ? ' active' : '');
+
+                var markerWrap = document.createElement('div');
+                markerWrap.className = 'phase-marker-wrap';
+
+                var num = document.createElement('span');
+                num.className = 'phase-num';
+                num.textContent = phase.num;
+
+                var pct = document.createElement('span');
+                pct.className = 'phase-pct';
+                pct.textContent = phase.pct + '%';
+
+                markerWrap.appendChild(num);
+                markerWrap.appendChild(pct);
+
+                var label = document.createElement('div');
+                label.className = 'phase-label';
+                label.textContent = phase.name;
+
+                var range = document.createElement('div');
+                range.className = 'phase-range';
+                range.textContent = phase.range;
+
+                node.appendChild(markerWrap);
+                node.appendChild(label);
+                node.appendChild(range);
+                container.appendChild(node);
+            });
+        }
+
+        function renderStatusBar() {
+            var bar = document.getElementById('statusBar');
+            var legend = document.getElementById('statusLegend');
+
+            // Clear existing
+            while (bar.firstChild) { bar.removeChild(bar.firstChild); }
+            while (legend.firstChild) { legend.removeChild(legend.firstChild); }
+
+            var counts = dashboardData.statusCounts;
+            var total = counts.complete + counts.onTrack + counts.atRisk + counts.blocked + counts.notStarted;
+
+            var statuses = [
+                { key: 'complete', label: 'Complete', count: counts.complete, class: 'complete' },
+                { key: 'onTrack', label: 'On Track', count: counts.onTrack, class: 'on-track' },
+                { key: 'atRisk', label: 'At Risk', count: counts.atRisk, class: 'at-risk' },
+                { key: 'blocked', label: 'Blocked', count: counts.blocked, class: 'blocked' },
+                { key: 'notStarted', label: 'Not Started', count: counts.notStarted, class: 'not-started' }
+            ];
+
+            statuses.forEach(function(s) {
+                if (s.count > 0) {
+                    var pct = Math.round((s.count / total) * 100);
+                    var seg = document.createElement('div');
+                    seg.className = 'status-segment ' + s.class;
+                    seg.style.width = pct + '%';
+                    seg.textContent = s.count;
+                    bar.appendChild(seg);
+                }
+
+                // Legend item
+                var item = document.createElement('div');
+                item.className = 'status-legend-item';
+
+                var dot = document.createElement('div');
+                dot.className = 'status-dot ' + s.class;
+
+                var text = document.createElement('span');
+                text.className = 'status-legend-text';
+
+                var countSpan = document.createElement('span');
+                countSpan.className = 'status-legend-count';
+                countSpan.textContent = s.count;
+
+                text.appendChild(countSpan);
+                text.appendChild(document.createTextNode(' ' + s.label));
+
+                item.appendChild(dot);
+                item.appendChild(text);
+                legend.appendChild(item);
+            });
+        }
+
+        function renderKeyMetrics() {
+            var container = document.getElementById('keyMetrics');
+            while (container.firstChild) { container.removeChild(container.firstChild); }
+
+            var counts = dashboardData.statusCounts;
+            var total = counts.complete + counts.onTrack + counts.atRisk + counts.blocked + counts.notStarted;
+
+            var metrics = [
+                { label: 'Market Size', value: '525k tons' },
+                { label: 'ATL Shipments', value: '74.5k tons' },
+                { label: 'EBITDA Target', value: '21.5%' },
+                { label: 'Total Tasks', value: total.toString() },
+                { label: 'Critical Path', value: '51' }
+            ];
+
+            metrics.forEach(function(m) {
+                var row = document.createElement('div');
+                row.className = 'metric-row';
+
+                var label = document.createElement('span');
+                label.className = 'metric-label';
+                label.textContent = m.label;
+
+                var value = document.createElement('span');
+                value.className = 'metric-value';
+                value.textContent = m.value;
+
+                row.appendChild(label);
+                row.appendChild(value);
+                container.appendChild(row);
+            });
+        }
+
+        function renderPillars() {
+            var container = document.getElementById('pillarSection');
+            while (container.firstChild) { container.removeChild(container.firstChild); }
+
+            dashboardData.pillars.forEach(function(pillar) {
+                var card = document.createElement('div');
+                card.className = 'pillar-card ' + pillar.class;
+
+                var header = document.createElement('div');
+                header.className = 'pillar-header';
+
+                var name = document.createElement('div');
+                name.className = 'pillar-name';
+                name.textContent = pillar.name;
+
+                var potential = document.createElement('div');
+                potential.className = 'pillar-potential';
+                potential.textContent = pillar.potential;
+
+                header.appendChild(name);
+                header.appendChild(potential);
+
+                var how = document.createElement('div');
+                how.className = 'pillar-how';
+                how.textContent = pillar.how;
+
+                var stats = document.createElement('div');
+                stats.className = 'pillar-stats';
+
+                var statItems = [
+                    { value: pillar.budget, label: 'Budget', green: true },
+                    { value: pillar.tasks, label: 'Tasks', green: false },
+                    { value: pillar.critical, label: 'Critical', green: false }
+                ];
+
+                statItems.forEach(function(s) {
+                    var stat = document.createElement('div');
+                    stat.className = 'pillar-stat';
+
+                    var val = document.createElement('div');
+                    val.className = 'pillar-stat-value' + (s.green ? ' green' : '');
+                    val.textContent = s.value;
+
+                    var lbl = document.createElement('div');
+                    lbl.className = 'pillar-stat-label';
+                    lbl.textContent = s.label;
+
+                    stat.appendChild(val);
+                    stat.appendChild(lbl);
+                    stats.appendChild(stat);
+                });
+
+                card.appendChild(header);
+                card.appendChild(how);
+                card.appendChild(stats);
+                container.appendChild(card);
+            });
+        }
+
+        function renderMilestones() {
+            var container = document.getElementById('milestoneList');
+            while (container.firstChild) { container.removeChild(container.firstChild); }
+
+            dashboardData.milestones.forEach(function(m) {
+                var row = document.createElement('div');
+                row.className = 'milestone-row';
+
+                var date = document.createElement('span');
+                date.className = 'milestone-date';
+                date.textContent = m.date;
+
+                var text = document.createElement('span');
+                text.className = 'milestone-text';
+                text.textContent = m.text;
+
+                var status = document.createElement('span');
+                status.className = 'milestone-status' + (m.status ? ' ' + m.status : '');
+
+                row.appendChild(date);
+                row.appendChild(text);
+                row.appendChild(status);
+                container.appendChild(row);
+            });
+        }
+
+        function updateTimestamp() {
+            var el = document.getElementById('dataTimestamp');
+            var source = dataSource === 'sharepoint' ? 'Live' : 'Cached';
+            var time = spApi.formatDate(new Date(), true);
+            el.textContent = 'Data Updated: ' + time + ' (' + source + ')';
+        }
+    </script>
+</body>
+</html>

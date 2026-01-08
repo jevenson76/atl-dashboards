@@ -1,0 +1,104 @@
+{
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "$connections": {
+            "defaultValue": {},
+            "type": "Object"
+        }
+    },
+    "triggers": {
+        "manual": {
+            "type": "Request",
+            "kind": "Http",
+            "inputs": {
+                "method": "POST",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "listName": {
+                            "type": "string",
+                            "description": "SharePoint list name"
+                        },
+                        "select": {
+                            "type": "string",
+                            "description": "OData $select fields"
+                        },
+                        "filter": {
+                            "type": "string",
+                            "description": "OData $filter expression"
+                        },
+                        "top": {
+                            "type": "integer",
+                            "description": "Max items to return"
+                        },
+                        "orderby": {
+                            "type": "string",
+                            "description": "OData $orderby expression"
+                        }
+                    },
+                    "required": ["listName"]
+                }
+            }
+        }
+    },
+    "actions": {
+        "Get_items": {
+            "runAfter": {},
+            "type": "ApiConnection",
+            "inputs": {
+                "host": {
+                    "connection": {
+                        "name": "@parameters('$connections')['sharepointonline']['connectionId']"
+                    }
+                },
+                "method": "get",
+                "path": "/datasets/@{encodeURIComponent(encodeURIComponent('https://chamberlaingroup.sharepoint.com/sites/PrincipalGTMStrategy-InternalUseOnly-ATLIntegrationProject'))}/tables/@{encodeURIComponent(encodeURIComponent(triggerBody()?['listName']))}/items",
+                "queries": {
+                    "$top": "@{if(equals(triggerBody()?['top'], null), 500, triggerBody()?['top'])}",
+                    "$filter": "@{if(equals(triggerBody()?['filter'], null), '', triggerBody()?['filter'])}",
+                    "$orderby": "@{if(equals(triggerBody()?['orderby'], null), '', triggerBody()?['orderby'])}"
+                }
+            }
+        },
+        "Response": {
+            "runAfter": {
+                "Get_items": ["Succeeded"]
+            },
+            "type": "Response",
+            "kind": "Http",
+            "inputs": {
+                "statusCode": 200,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "Content-Type"
+                },
+                "body": {
+                    "items": "@body('Get_items')?['value']",
+                    "count": "@length(body('Get_items')?['value'])",
+                    "timestamp": "@utcNow()"
+                }
+            }
+        },
+        "Response_Error": {
+            "runAfter": {
+                "Get_items": ["Failed", "TimedOut"]
+            },
+            "type": "Response",
+            "kind": "Http",
+            "inputs": {
+                "statusCode": 500,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                "body": {
+                    "error": "Failed to retrieve items from SharePoint",
+                    "details": "@{result('Get_items')}"
+                }
+            }
+        }
+    },
+    "outputs": {}
+}

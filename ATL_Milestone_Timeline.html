@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATL Integration | Milestone Timeline</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Brand Colors */
+            --cg-navy: #003087;
+            --cg-navy-dark: #00256b;
+            --arrow-blue: #4A90D9;
+            --arrow-blue-light: #6BA3E0;
+            --arrow-red: #E94E4E;
+            /* Backgrounds */
+            --bg-primary: #f8f9fb;
+            --bg-white: #ffffff;
+            /* Borders */
+            --border: #e2e5eb;
+            --border-light: #eef0f3;
+            /* Text */
+            --text-primary: #1a1f36;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+            /* Status Colors */
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #E94E4E;
+            --danger-light: #fee2e2;
+            /* Design Tokens */
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-xl: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+            /* Typography */
+            --font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 16px; scroll-behavior: smooth; }
+        body {
+            font-family: var(--font);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(233, 78, 78, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(233, 78, 78, 0); }
+        }
+
+        /* Navigation - relative for SharePoint compatibility */
+        nav {
+            position: relative;
+            z-index: 100;
+            background: var(--cg-navy);
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 56px;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-logos {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-logos img {
+            height: 24px;
+            filter: brightness(0) invert(1);
+        }
+
+        .nav-divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(255,255,255,0.5);
+        }
+
+        .nav-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link {
+            padding: 0.4rem 0.875rem;
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255,255,255,0.12);
+            transform: translateY(-1px);
+        }
+
+        .nav-link.active {
+            color: white;
+            background: rgba(255,255,255,0.15);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            background: var(--arrow-blue);
+            border-radius: 1px;
+        }
+
+        .nav-link:focus-visible {
+            outline: 2px solid var(--arrow-blue);
+            outline-offset: 2px;
+        }
+
+        /* Hero Header */
+        .hero {
+            background: linear-gradient(135deg, var(--cg-navy) 0%, var(--cg-navy-dark) 100%);
+            padding: 2rem 2rem 1.5rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: radial-gradient(ellipse at 80% 20%, rgba(74, 144, 217, 0.15) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .hero-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .hero-title-block h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-title-block p {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.9);
+            font-weight: 400;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .page-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .page-header h2 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Timeline Legend */
+        .timeline-legend {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding: 1rem 1.5rem;
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+            flex-wrap: wrap;
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.completed { background: var(--success); }
+        .legend-dot.on-track { background: var(--arrow-blue); }
+        .legend-dot.at-risk { background: var(--warning); }
+        .legend-dot.critical { background: var(--danger); }
+
+        /* Timeline Container */
+        .timeline-container {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--success), var(--arrow-blue), var(--text-muted));
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        /* Milestone Cards */
+        .milestone {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .milestone:nth-child(odd) {
+            flex-direction: row;
+        }
+
+        .milestone:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .milestone-content {
+            width: 45%;
+            padding: 1.5rem;
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .milestone-content:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--arrow-blue);
+        }
+
+        .milestone-content::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            width: 20px;
+            height: 2px;
+            background: var(--border);
+        }
+
+        .milestone:nth-child(odd) .milestone-content::before {
+            right: -20px;
+        }
+
+        .milestone:nth-child(even) .milestone-content::before {
+            left: -20px;
+        }
+
+        .milestone-marker {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 10;
+        }
+
+        .milestone-marker.completed { background: var(--success); }
+        .milestone-marker.on-track { background: var(--arrow-blue); }
+        .milestone-marker.at-risk { background: var(--warning); }
+        .milestone-marker.critical { background: var(--danger); }
+
+        .milestone-date {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .milestone-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .milestone-phase {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--arrow-blue);
+            background: rgba(74, 144, 217, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.75rem;
+        }
+
+        .milestone-description {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .milestone-meta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .meta-item strong {
+            color: var(--text-secondary);
+        }
+
+        .milestone-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .milestone-status:hover {
+            transform: scale(1.05);
+        }
+
+        .status-completed {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .status-on-track {
+            background: rgba(74, 144, 217, 0.15);
+            color: var(--arrow-blue);
+        }
+
+        .status-at-risk {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .status-critical {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .today-marker {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--arrow-red);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-xl);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            z-index: 20;
+            animation: pulse 2s ease-in-out infinite;
+        }
+    
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .timeline-line {
+                left: 20px;
+            }
+
+            .milestone,
+            .milestone:nth-child(even) {
+                flex-direction: row;
+                padding-left: 50px;
+            }
+
+            .milestone-content {
+                width: 100%;
+            }
+
+            .milestone-content::before {
+                left: -30px !important;
+                right: auto !important;
+            }
+
+            .milestone-marker {
+                left: 20px;
+            }
+
+            .today-marker {
+                left: 20px;
+                transform: translateX(-50%);
+            }
+        }
+
+        /* === TEXT OVERFLOW PROTECTION === */
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
+        .hero-container,
+        .main-content {
+            overflow: hidden;
+            max-width: 100%;
+        }
+
+        /* Single-line text truncation */
+        .nav-title,
+        .milestone-title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Multi-line text truncation */
+        .milestone-description {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            line-clamp: 3;
+        }
+
+        /* Prevent card content overflow */
+        .milestone-content,
+        .timeline-legend {
+            overflow: hidden;
+        }
+
+        /* Word break for long values */
+        .milestone-date,
+        .meta-item {
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-brand">
+            <div class="nav-logos">
+                <img src="/sites/PrincipalGTMStrategy-InternalUseOnly/Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/Site/Assets/transparent/ArrowTruLine.png" alt="Arrow Tru-Line">
+                <div class="nav-divider"></div>
+                <img src="/sites/PrincipalGTMStrategy-InternalUseOnly/Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/Site/Assets/transparent/Chamberlain-logo-blue.png" alt="Chamberlain Group">
+            </div>
+            <span class="nav-title">2026 Integration Plan</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Dashboard</a>
+            <a href="ATL_Project_Gantt.html" class="nav-link">Gantt</a>
+            <a href="ATL_Status_Hub.html" class="nav-link">Status</a>
+            <a href="ATL_My_Tasks.html" class="nav-link">My Tasks</a>
+            <a href="ATL_Team_Workload.html" class="nav-link">Teams</a>
+            <a href="ATL_Reports.html" class="nav-link">Reports</a>
+            <a href="ATL_Admin.html" class="nav-link">Admin</a>
+        </div>
+    </nav>
+
+    <!-- Hero Header -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-header">
+                <div class="hero-title-block">
+                    <h1>Milestone Timeline</h1>
+                    <p>Key project milestones and critical path deliverables</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="main-content">
+        <div class="page-header">
+            <h2>Integration Milestones</h2>
+        </div>
+
+        <div class="timeline-legend">
+            <div class="legend-item"><div class="legend-dot completed"></div><span>Completed</span></div>
+            <div class="legend-item"><div class="legend-dot on-track"></div><span>On Track</span></div>
+            <div class="legend-item"><div class="legend-dot at-risk"></div><span>At Risk</span></div>
+            <div class="legend-item"><div class="legend-dot critical"></div><span>Critical</span></div>
+        </div>
+
+        <div class="timeline-container" id="timelineContainer">
+            <div class="timeline-line"></div>
+        </div>
+    </div>
+
+    <script>
+        var milestones = [
+            { date: '2025-12-19', title: 'Budget & Financial Planning', phase: 'Phase 1: Stabilization', description: 'Complete 2026 budget projections and financial planning for ATL integration.', owner: 'Ken Sittman', status: 'at-risk', dependencies: 3 },
+            { date: '2026-01-09', title: 'SKU Remediation Complete', phase: 'Phase 1: Stabilization', description: 'Consolidate and standardize product SKUs across both organizations.', owner: 'Rick Richkowski', status: 'on-track', dependencies: 2 },
+            { date: '2026-01-31', title: 'CRU Index Pricing Launch', phase: 'Phase 2: Foundation', description: 'Implement dynamic pricing based on CRU steel index.', owner: 'Larry Jones', status: 'critical', dependencies: 4 },
+            { date: '2026-02-15', title: 'Lost Customer Win-Back', phase: 'Phase 1: Stabilization', description: 'Launch campaign to re-engage churned customers with new value proposition.', owner: 'Kedaresh Deshpande', status: 'on-track', dependencies: 1 },
+            { date: '2026-03-06', title: 'Product Catalog Integration', phase: 'Phase 2: Foundation', description: 'Unified product catalog with combined CG and ATL offerings.', owner: 'Tony Pusateri', status: 'on-track', dependencies: 5 },
+            { date: '2026-03-06', title: 'Website Portal Launch', phase: 'Phase 2: Foundation', description: 'Launch integrated customer portal for ordering and account management.', owner: 'Tony Pusateri', status: 'on-track', dependencies: 3 },
+            { date: '2026-04-15', title: 'Sales Transformation Complete', phase: 'Phase 3: Acceleration', description: 'Complete sales team integration and territory realignment.', owner: 'John McLaughlin', status: 'on-track', dependencies: 2 },
+            { date: '2026-06-05', title: 'Dealer Portal Phase 1', phase: 'Phase 3: Acceleration', description: 'Launch dealer self-service portal with ordering and inventory visibility.', owner: 'Tony Pusateri', status: 'on-track', dependencies: 4 },
+            { date: '2026-07-31', title: 'Project Complete', phase: 'Phase 5: Optimization', description: 'Full integration complete with all systems operational.', owner: 'PMO', status: 'on-track', dependencies: 0 }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTimeline();
+        });
+
+        function formatDate(dateStr) {
+            var date = new Date(dateStr);
+            var options = { month: 'short', day: 'numeric', year: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        function isToday(dateStr) {
+            var today = new Date();
+            var date = new Date(dateStr);
+            return today.toDateString() === date.toDateString();
+        }
+
+        function isPast(dateStr) {
+            var today = new Date();
+            today.setHours(0, 0, 0, 0);
+            var date = new Date(dateStr);
+            return date < today;
+        }
+
+        function getStatusLabel(status) {
+            var labels = {
+                'completed': 'Completed',
+                'on-track': 'On Track',
+                'at-risk': 'At Risk',
+                'critical': 'Critical'
+            };
+            return labels[status] || status;
+        }
+
+        function renderTimeline() {
+            var container = document.getElementById('timelineContainer');
+            var todayInserted = false;
+
+            milestones.forEach(function(milestone, index) {
+                // Insert today marker before first future milestone
+                if (!todayInserted && !isPast(milestone.date)) {
+                    var todayMarker = document.createElement('div');
+                    todayMarker.className = 'today-marker';
+                    todayMarker.textContent = 'Today';
+                    todayMarker.style.top = (index * 180) + 'px';
+                    container.appendChild(todayMarker);
+                    todayInserted = true;
+                }
+
+                var milestoneEl = document.createElement('div');
+                milestoneEl.className = 'milestone';
+
+                // Marker
+                var marker = document.createElement('div');
+                marker.className = 'milestone-marker ' + milestone.status;
+
+                // Content
+                var content = document.createElement('div');
+                content.className = 'milestone-content';
+
+                var dateEl = document.createElement('div');
+                dateEl.className = 'milestone-date';
+                dateEl.textContent = formatDate(milestone.date);
+
+                var titleEl = document.createElement('div');
+                titleEl.className = 'milestone-title';
+                titleEl.textContent = milestone.title;
+
+                var phaseEl = document.createElement('div');
+                phaseEl.className = 'milestone-phase';
+                phaseEl.textContent = milestone.phase;
+
+                var descEl = document.createElement('div');
+                descEl.className = 'milestone-description';
+                descEl.textContent = milestone.description;
+
+                var metaEl = document.createElement('div');
+                metaEl.className = 'milestone-meta';
+
+                var ownerMeta = document.createElement('div');
+                ownerMeta.className = 'meta-item';
+                var ownerLabel = document.createElement('strong');
+                ownerLabel.textContent = 'Owner: ';
+                ownerMeta.appendChild(ownerLabel);
+                ownerMeta.appendChild(document.createTextNode(milestone.owner));
+
+                var depMeta = document.createElement('div');
+                depMeta.className = 'meta-item';
+                var depLabel = document.createElement('strong');
+                depLabel.textContent = 'Dependencies: ';
+                depMeta.appendChild(depLabel);
+                depMeta.appendChild(document.createTextNode(milestone.dependencies + ' tasks'));
+
+                metaEl.appendChild(ownerMeta);
+                metaEl.appendChild(depMeta);
+
+                var statusEl = document.createElement('div');
+                statusEl.className = 'milestone-status status-' + milestone.status;
+                statusEl.textContent = getStatusLabel(milestone.status);
+
+                content.appendChild(dateEl);
+                content.appendChild(titleEl);
+                content.appendChild(phaseEl);
+                content.appendChild(descEl);
+                content.appendChild(metaEl);
+                content.appendChild(statusEl);
+
+                milestoneEl.appendChild(content);
+                milestoneEl.appendChild(marker);
+
+                container.appendChild(milestoneEl);
+            });
+        }
+    </script>
+    <script src="spApi.js"></script>
+</body>
+</html>
