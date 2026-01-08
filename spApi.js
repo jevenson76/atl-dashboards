@@ -28,7 +28,8 @@
 
         // Auto-detect if running externally (not on SharePoint)
         // When true and flowProxyUrl is set, uses Flow proxy for data
-        useFlowProxy: null,  // null = auto-detect, true = force proxy, false = force direct
+        // FORCED TRUE: Auto-detection was failing due to browser caching
+        useFlowProxy: true,  // null = auto-detect, true = force proxy, false = force direct
 
         // Canonical list names (ONLY use these - verified 2026-01-07)
         lists: {
