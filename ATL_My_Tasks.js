@@ -4,92 +4,93 @@
 (function() {
     'use strict';
 
-    // Sample task data - replace with SharePoint list data
+    // Sample task data - PMO Lead (Jason Evenson) tasks for demo
     var myTasks = [
         {
-            id: 'T001',
-            title: 'Complete SKU remediation analysis',
-            phase: 'Phase 1: Stabilization',
-            workstream: 'SKU Remediation',
-            status: 'in-progress',
-            progress: 65,
-            dueDate: '2025-01-15',
-            owner: 'Current User',
-            notes: [
-                { date: '2024-12-20', text: 'Identified 450 SKUs requiring review' },
-                { date: '2024-12-18', text: 'Initial analysis started' }
-            ],
-            attachments: []
-        },
-        {
-            id: 'T002',
-            title: 'Review torsion tube pricing contracts',
-            phase: 'Phase 1: Stabilization',
-            workstream: 'Torsion Tube Contracts',
-            status: 'at-risk',
-            progress: 40,
-            dueDate: '2025-01-10',
-            owner: 'Current User',
-            notes: [
-                { date: '2024-12-19', text: 'Waiting on supplier feedback' }
-            ],
-            attachments: ['Contract_Draft_v2.pdf']
-        },
-        {
             id: 'T003',
-            title: 'Reporting Standards',
+            title: 'Reporting Standards & Dashboard Automation',
             phase: 'Phase 1: Stabilization',
-            workstream: 'Foundation',
+            workstream: 'PMO Foundation',
             status: 'completed',
             progress: 100,
             dueDate: '2025-12-19',
             owner: 'Jason Evenson',
             notes: [
-                { date: '2025-12-19', text: 'Reporting standards finalized and documented' }
+                { date: '2025-12-19', text: 'Dashboard deployed to SharePoint. KPIs updating hourly via Power Automate.' },
+                { date: '2025-12-15', text: 'Reporting standards document finalized and approved by leadership.' }
             ],
-            attachments: []
-        },
-        {
-            id: 'T004',
-            title: 'Validate ERP data migration specs',
-            phase: 'Phase 2: Integration',
-            workstream: 'ERP Integration',
-            status: 'in-progress',
-            progress: 80,
-            dueDate: '2025-01-25',
-            owner: 'Current User',
-            notes: [
-                { date: '2024-12-21', text: 'Almost complete - final review in progress' }
-            ],
-            attachments: ['Migration_Specs.xlsx', 'Data_Map.pdf']
-        },
-        {
-            id: 'T005',
-            title: 'Coordinate with logistics team on inventory transfer',
-            phase: 'Phase 2: Integration',
-            workstream: 'Logistics',
-            status: 'blocked',
-            progress: 25,
-            dueDate: '2025-01-08',
-            owner: 'Current User',
-            notes: [
-                { date: '2024-12-20', text: 'Blocked - waiting for warehouse access approval' }
-            ],
-            attachments: []
+            attachments: ['Reporting_Standards_v2.pdf']
         },
         {
             id: 'T006',
-            title: 'Complete safety training documentation',
+            title: 'SKU Remediation - Cataloging & Analysis',
             phase: 'Phase 1: Stabilization',
-            workstream: 'HR & Compliance',
-            status: 'completed',
-            progress: 100,
-            dueDate: '2024-12-15',
-            owner: 'Current User',
+            workstream: 'SKU Remediation',
+            status: 'in-progress',
+            progress: 45,
+            dueDate: '2026-01-16',
+            owner: 'Jason Evenson',
             notes: [
-                { date: '2024-12-15', text: 'Completed and submitted' }
+                { date: '2026-01-06', text: 'Identified 450 SKUs requiring review. Working with ATL ops on prioritization.' },
+                { date: '2025-12-28', text: 'Initial SKU export received from ATL systems.' }
             ],
-            attachments: ['Training_Cert.pdf']
+            attachments: ['SKU_Analysis_Draft.xlsx']
+        },
+        {
+            id: 'T011',
+            title: 'Training Program Development',
+            phase: 'Phase 2: Foundation',
+            workstream: 'Change Management',
+            status: 'in-progress',
+            progress: 30,
+            dueDate: '2026-02-06',
+            owner: 'Jason Evenson',
+            notes: [
+                { date: '2026-01-05', text: 'Outlined training modules for SharePoint, task updates, and reporting.' }
+            ],
+            attachments: []
+        },
+        {
+            id: 'T012',
+            title: 'CRM/System Integration Planning',
+            phase: 'Phase 2: Foundation',
+            workstream: 'Systems',
+            status: 'at-risk',
+            progress: 20,
+            dueDate: '2026-02-06',
+            owner: 'Jason Evenson',
+            notes: [
+                { date: '2026-01-07', text: 'Need IT resource assignment. Escalating to Jennifer.' }
+            ],
+            attachments: []
+        },
+        {
+            id: 'T015',
+            title: 'Weekly PMO Cadence - First Sync Setup',
+            phase: 'Phase 1: Stabilization',
+            workstream: 'PMO Operations',
+            status: 'in-progress',
+            progress: 75,
+            dueDate: '2026-01-15',
+            owner: 'Jason Evenson',
+            notes: [
+                { date: '2026-01-08', text: 'Calendar invites sent. Agenda template created.' }
+            ],
+            attachments: ['Weekly_Sync_Agenda_Template.docx']
+        },
+        {
+            id: 'T016',
+            title: 'Planner Board Configuration',
+            phase: 'Phase 1: Stabilization',
+            workstream: 'PMO Operations',
+            status: 'blocked',
+            progress: 50,
+            dueDate: '2026-01-10',
+            owner: 'Jason Evenson',
+            notes: [
+                { date: '2026-01-07', text: 'Blocked - need Teams group permissions from IT. Ticket submitted.' }
+            ],
+            attachments: []
         }
     ];
 
@@ -110,7 +111,7 @@
 
     // Initialize user display
     function initUser() {
-        var userName = 'John Smith';
+        var userName = 'Jason Evenson';
         var userInitials = userName.split(' ').map(function(n) { return n[0]; }).join('');
 
         var avatarEl = document.getElementById('userAvatar');

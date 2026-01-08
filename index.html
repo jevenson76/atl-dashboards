@@ -299,6 +299,10 @@
             color: var(--text-secondary);
         }
 
+        .phase-marker, .phase-connector, .phase-connector-fill {
+            display: none;
+        }
+
         /* Main Content */
         .main-container {
             max-width: 1400px;
@@ -430,7 +434,6 @@
             font-size: 0.75rem;
             font-weight: 700;
             color: white;
-            transition: width 0.5s ease;
         }
 
         .status-segment.complete { background: var(--cg-green); }
@@ -783,10 +786,11 @@
             background: var(--bg-white);
             border-top: 1px solid var(--border);
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             font-size: 0.85rem;
             color: var(--text-secondary);
+            text-align: center;
         }
 
         .footer-status {
@@ -801,18 +805,6 @@
             background: var(--cg-green);
             border-radius: 50%;
             animation: pulse 2s infinite;
-        }
-
-        .data-timestamp {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        /* Loading State */
-        .loading-shimmer {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
         }
 
         /* Responsive */
@@ -833,46 +825,69 @@
             .nav-brand { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
         }
 
-        /* Text Overflow Protection */
+
+        /* === TEXT OVERFLOW PROTECTION === */
+
+        /* Prevent horizontal overflow on body/containers */
         html, body {
             overflow-x: hidden;
             max-width: 100%;
         }
 
-        .nav-title, .pillar-name, .criteria-label, .metric-label,
-        .milestone-text, .product-name, .kpi-label {
+        /* Single-line text truncation */
+        .nav-title,
+        .pillar-name,
+        .criteria-label,
+        .metric-label,
+        .milestone-text,
+        .product-name,
+        .kpi-label,
+        .task-title,
+        .gantt-task-name {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
-        .pillar-how {
+        /* Multi-line text truncation */
+        .pillar-how,
+        .task-description,
+        .description-text {
             overflow: hidden;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
+            line-clamp: 2;
         }
 
-        .card, .sidebar-card {
+        /* Prevent card/container overflow */
+        .card,
+        .sidebar-card,
+        .gantt-row,
+        .task-row {
             overflow: hidden;
             max-width: 100%;
         }
 
-        .value, .metric-value, .stat-value {
+        /* Word break for long values */
+        .value,
+        .metric-value,
+        .stat-value {
             word-break: break-word;
             overflow-wrap: break-word;
         }
+
     </style>
 </head>
 <body>
     <nav>
         <div class="nav-brand">
             <div class="nav-logos">
-                <img src="Assets/transparent/ArrowTruLine.png" alt="Arrow Tru-Line" style="height: 22px;">
+                <img src="Assets/transparent/ArrowTruLine.png" alt="Arrow Tru-Line" onerror="this.style.display='none'">
                 <div class="nav-divider"></div>
-                <img src="Assets/transparent/Chamberlain-logo-blue.png" alt="Chamberlain Group" style="height: 18px;">
+                <img src="Assets/transparent/Chamberlain-logo-blue.png" alt="Chamberlain Group" onerror="this.style.display='none'">
             </div>
-            <span class="nav-title">2026 Integration Plan</span>
+            <span class="nav-title">ATL Integration Hub</span>
         </div>
         <div class="nav-links">
             <a href="index.html" class="nav-link active">Dashboard</a>
@@ -936,8 +951,47 @@
                 <span class="phase-title">Integration Phases</span>
                 <span class="phase-dates">Jan 2026 - Dec 2026</span>
             </div>
-            <div class="phase-track" id="phaseTrack">
-                <!-- Rendered by JavaScript -->
+            <div class="phase-track">
+                <div class="phase-node active">
+                    <div class="phase-marker-wrap">
+                        <span class="phase-num">1</span>
+                        <span class="phase-pct">15%</span>
+                    </div>
+                    <div class="phase-label">Stabilization</div>
+                    <div class="phase-range">Jan - Feb</div>
+                </div>
+                <div class="phase-node">
+                    <div class="phase-marker-wrap">
+                        <span class="phase-num">2</span>
+                        <span class="phase-pct">0%</span>
+                    </div>
+                    <div class="phase-label">Foundation</div>
+                    <div class="phase-range">Mar - Apr</div>
+                </div>
+                <div class="phase-node">
+                    <div class="phase-marker-wrap">
+                        <span class="phase-num">3</span>
+                        <span class="phase-pct">0%</span>
+                    </div>
+                    <div class="phase-label">Acceleration</div>
+                    <div class="phase-range">May - Jul</div>
+                </div>
+                <div class="phase-node">
+                    <div class="phase-marker-wrap">
+                        <span class="phase-num">4</span>
+                        <span class="phase-pct">0%</span>
+                    </div>
+                    <div class="phase-label">Optimization</div>
+                    <div class="phase-range">Aug - Oct</div>
+                </div>
+                <div class="phase-node">
+                    <div class="phase-marker-wrap">
+                        <span class="phase-num">5</span>
+                        <span class="phase-pct">0%</span>
+                    </div>
+                    <div class="phase-label">Completion</div>
+                    <div class="phase-range">Nov - Dec</div>
+                </div>
             </div>
         </div>
     </section>
@@ -984,20 +1038,129 @@
                     </div>
                 </div>
 
-                <!-- Task Status Overview - LIVE DATA -->
+                <!-- Task Status Overview -->
                 <div class="status-section">
                     <div class="status-title">Project Task Status</div>
-                    <div class="status-bar-wrap" id="statusBar">
-                        <!-- Rendered by JavaScript from SharePoint -->
+                    <div class="status-bar-wrap">
+                        <div class="status-segment complete" style="width: 8%;">14</div>
+                        <div class="status-segment on-track" style="width: 45%;">77</div>
+                        <div class="status-segment at-risk" style="width: 12%;">21</div>
+                        <div class="status-segment blocked" style="width: 5%;">9</div>
+                        <div class="status-segment not-started" style="width: 30%;">51</div>
                     </div>
-                    <div class="status-legend" id="statusLegend">
-                        <!-- Rendered by JavaScript from SharePoint -->
+                    <div class="status-legend">
+                        <div class="status-legend-item">
+                            <div class="status-dot complete"></div>
+                            <span class="status-legend-text"><span class="status-legend-count">14</span> Complete</span>
+                        </div>
+                        <div class="status-legend-item">
+                            <div class="status-dot on-track"></div>
+                            <span class="status-legend-text"><span class="status-legend-count">77</span> On Track</span>
+                        </div>
+                        <div class="status-legend-item">
+                            <div class="status-dot at-risk"></div>
+                            <span class="status-legend-text"><span class="status-legend-count">21</span> At Risk</span>
+                        </div>
+                        <div class="status-legend-item">
+                            <div class="status-dot blocked"></div>
+                            <span class="status-legend-text"><span class="status-legend-count">9</span> Blocked</span>
+                        </div>
+                        <div class="status-legend-item">
+                            <div class="status-dot not-started"></div>
+                            <span class="status-legend-text"><span class="status-legend-count">51</span> Not Started</span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Pillar Cards -->
-                <div class="pillar-section" id="pillarSection">
-                    <!-- Rendered by JavaScript from SharePoint -->
+                <div class="pillar-section">
+                <div class="pillar-card p1">
+                    <div class="pillar-header">
+                        <div class="pillar-name">Expand Product Share</div>
+                        <div class="pillar-potential">$12M</div>
+                    </div>
+                    <div class="pillar-how">Torsion Tubes Share Gain (Amarr, CHI, Haas)</div>
+                    <div class="pillar-stats">
+                        <div class="pillar-stat">
+                            <div class="pillar-stat-value green">$9M</div>
+                            <div class="pillar-stat-label">Budget</div>
+                        </div>
+                        <div class="pillar-stat">
+                            <div class="pillar-stat-value">38</div>
+                            <div class="pillar-stat-label">Tasks</div>
+                        </div>
+                        <div class="pillar-stat">
+                            <div class="pillar-stat-value">19</div>
+                            <div class="pillar-stat-label">Critical</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pillar-card p2">
+                    <div class="pillar-header">
+                        <div class="pillar-name">CG GTM Synergy</div>
+                        <div class="pillar-potential">$8.5M</div>
+                    </div>
+                    <div class="pillar-how">CPSG conversion, LiftMaster partner leverage</div>
+                    <div class="pillar-stats">
+                        <div class="pillar-stat">
+                            <div class="pillar-stat-value green">$6M</div>
+                            <div class="pillar-stat-label">Budget</div>
+                        </div>
+                        <div class="pillar-stat">
+                            <div class="pillar-stat-value">30</div>
+                            <div class="pillar-stat-label">Tasks</div>
+                        </div>
+                        <div class="pillar-stat">
+                            <div class="pillar-stat-value">12</div>
+                            <div class="pillar-stat-label">Critical</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pillar-card p3">
+                    <div class="pillar-header">
+                        <div class="pillar-name">Incremental Pipeline</div>
+                        <div class="pillar-potential">$6M</div>
+                    </div>
+                    <div class="pillar-how">Haas, Raynor Trailer, Midland segments</div>
+                    <div class="pillar-stats">
+                        <div class="pillar-stat">
+                            <div class="pillar-stat-value green">$3M</div>
+                            <div class="pillar-stat-label">Budget</div>
+                        </div>
+                        <div class="pillar-stat">
+                            <div class="pillar-stat-value">86</div>
+                            <div class="pillar-stat-label">Tasks</div>
+                        </div>
+                        <div class="pillar-stat">
+                            <div class="pillar-stat-value">15</div>
+                            <div class="pillar-stat-label">Critical</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pillar-card p4">
+                    <div class="pillar-header">
+                        <div class="pillar-name">Regaining Lost Business</div>
+                        <div class="pillar-potential">$6M</div>
+                    </div>
+                    <div class="pillar-how">Link Rail, down accounts (Clopay, Amarr, Pro Door)</div>
+                    <div class="pillar-stats">
+                        <div class="pillar-stat">
+                            <div class="pillar-stat-value green">$4.5M</div>
+                            <div class="pillar-stat-label">Budget</div>
+                        </div>
+                        <div class="pillar-stat">
+                            <div class="pillar-stat-value">18</div>
+                            <div class="pillar-stat-label">Tasks</div>
+                        </div>
+                        <div class="pillar-stat">
+                            <div class="pillar-stat-value">5</div>
+                            <div class="pillar-stat-label">Critical</div>
+                        </div>
+                    </div>
+                </div>
                 </div>
             </div>
 
@@ -1050,19 +1213,57 @@
                     </div>
                 </div>
 
-                <!-- Key Metrics - LIVE DATA -->
+                <!-- Key Metrics -->
                 <div class="sidebar-card">
                     <div class="sidebar-title">Key Metrics</div>
-                    <div class="metric-list" id="keyMetrics">
-                        <!-- Rendered by JavaScript from SharePoint -->
+                    <div class="metric-list">
+                        <div class="metric-row">
+                            <span class="metric-label">Market Size</span>
+                            <span class="metric-value">525k tons</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">ATL Shipments</span>
+                            <span class="metric-value">74.5k tons</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">EBITDA Target</span>
+                            <span class="metric-value">21.5%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Total Tasks</span>
+                            <span class="metric-value">172</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Critical Path</span>
+                            <span class="metric-value">51</span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Upcoming Milestones -->
                 <div class="sidebar-card">
                     <div class="sidebar-title">Upcoming Milestones</div>
-                    <div class="milestone-list" id="milestoneList">
-                        <!-- Rendered by JavaScript from SharePoint -->
+                    <div class="milestone-list">
+                        <div class="milestone-row">
+                            <span class="milestone-date">Dec 19</span>
+                            <span class="milestone-text">Budget Finalization</span>
+                            <span class="milestone-status at-risk"></span>
+                        </div>
+                        <div class="milestone-row">
+                            <span class="milestone-date">Jan 15</span>
+                            <span class="milestone-text">SKU Remediation Start</span>
+                            <span class="milestone-status on-track"></span>
+                        </div>
+                        <div class="milestone-row">
+                            <span class="milestone-date">Feb 01</span>
+                            <span class="milestone-text">Product Catalog Launch</span>
+                            <span class="milestone-status on-track"></span>
+                        </div>
+                        <div class="milestone-row">
+                            <span class="milestone-date">Mar 15</span>
+                            <span class="milestone-text">Dealer Portal Beta</span>
+                            <span class="milestone-status"></span>
+                        </div>
                     </div>
                 </div>
 
@@ -1070,22 +1271,27 @@
                 <div class="sidebar-card">
                     <div class="sidebar-title">Project Folders</div>
                     <div class="folder-list">
-                        <a href="../../../Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/Project%20Plan" class="folder-link">
+                        <a href="/sites/PrincipalGTMStrategy-InternalUseOnly-ATLIntegrationProject/Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/Project%20Plan" class="folder-link">
                             <span class="folder-icon">&#128193;</span>
                             <span class="folder-name">Project Plan</span>
                             <span class="folder-arrow">&rarr;</span>
                         </a>
-                        <a href="../../../Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/PMO%20Office" class="folder-link">
+                        <a href="/sites/PrincipalGTMStrategy-InternalUseOnly-ATLIntegrationProject/Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/PMO%20Office" class="folder-link">
                             <span class="folder-icon">&#128193;</span>
                             <span class="folder-name">PMO Office</span>
                             <span class="folder-arrow">&rarr;</span>
                         </a>
-                        <a href="../../../Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/Financials%20-%20ATL%20Enterprise" class="folder-link">
+                        <a href="/sites/PrincipalGTMStrategy-InternalUseOnly-ATLIntegrationProject/Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/Financials%20-%20ATL%20Enterprise" class="folder-link">
                             <span class="folder-icon">&#128193;</span>
                             <span class="folder-name">Financials</span>
                             <span class="folder-arrow">&rarr;</span>
                         </a>
-                        <a href="../../../Shared%20Documents/Forms/AllItems.aspx" class="folder-link view-all">
+                        <a href="/sites/PrincipalGTMStrategy-InternalUseOnly-ATLIntegrationProject/Shared%20Documents/ATL%20Integration%20Project%20-%20Documents/ATL__CG%20Shared%20Folder" class="folder-link">
+                            <span class="folder-icon">&#128193;</span>
+                            <span class="folder-name">ATL-CG Shared</span>
+                            <span class="folder-arrow">&rarr;</span>
+                        </a>
+                        <a href="/sites/PrincipalGTMStrategy-InternalUseOnly-ATLIntegrationProject/Shared%20Documents/Forms/AllItems.aspx" class="folder-link view-all">
                             <span class="folder-icon">&#128194;</span>
                             <span class="folder-name">View All Documents</span>
                             <span class="folder-arrow">&rarr;</span>
@@ -1117,475 +1323,6 @@
 
     <footer>
         <div>ATL Integration Project | Chamberlain Group | Jason Evenson</div>
-        <div class="data-timestamp" id="dataTimestamp">Loading data...</div>
     </footer>
-
-    <!-- SharePoint REST API Helper -->
-    <script src="spApi.js"></script>
-
-    <script>
-        // ============================================================
-        // Dashboard Data Loader
-        // ============================================================
-
-        // Fallback data for offline/error states
-        var fallbackData = {
-            statusCounts: { complete: 14, onTrack: 77, atRisk: 21, blocked: 9, notStarted: 51 },
-            phases: [
-                { num: 1, name: 'Stabilization', range: 'Jan - Feb', pct: 15, active: true },
-                { num: 2, name: 'Foundation', range: 'Mar - Apr', pct: 0, active: false },
-                { num: 3, name: 'Acceleration', range: 'May - Jul', pct: 0, active: false },
-                { num: 4, name: 'Optimization', range: 'Aug - Oct', pct: 0, active: false },
-                { num: 5, name: 'Completion', range: 'Nov - Dec', pct: 0, active: false }
-            ],
-            pillars: [
-                { name: 'Expand Product Share', potential: '$12M', budget: '$9M', tasks: 38, critical: 19, how: 'Torsion Tubes Share Gain (Amarr, CHI, Haas)', class: 'p1' },
-                { name: 'CG GTM Synergy', potential: '$8.5M', budget: '$6M', tasks: 30, critical: 12, how: 'CPSG conversion, LiftMaster partner leverage', class: 'p2' },
-                { name: 'Incremental Pipeline', potential: '$6M', budget: '$3M', tasks: 86, critical: 15, how: 'Haas, Raynor Trailer, Midland segments', class: 'p3' },
-                { name: 'Regaining Lost Business', potential: '$6M', budget: '$4.5M', tasks: 18, critical: 5, how: 'Link Rail, down accounts (Clopay, Amarr, Pro Door)', class: 'p4' }
-            ],
-            milestones: [
-                { date: 'Dec 19', text: 'Budget Finalization', status: 'at-risk' },
-                { date: 'Jan 15', text: 'SKU Remediation Start', status: 'on-track' },
-                { date: 'Feb 01', text: 'Product Catalog Launch', status: 'on-track' },
-                { date: 'Mar 15', text: 'Dealer Portal Beta', status: '' }
-            ]
-        };
-
-        // Current data (loaded from SharePoint or fallback)
-        var dashboardData = null;
-        var dataSource = 'loading';
-
-        document.addEventListener('DOMContentLoaded', function() {
-            initDashboard();
-        });
-
-        function initDashboard() {
-            // Show loading state
-            showLoadingState();
-
-            // Try to load from SharePoint REST API
-            loadFromSharePoint()
-                .then(function(data) {
-                    dashboardData = data;
-                    dataSource = 'sharepoint';
-                    renderDashboard();
-                })
-                .catch(function(error) {
-                    spApi.log('warn', 'SharePoint load failed, using fallback data', error.message);
-                    dashboardData = fallbackData;
-                    dataSource = 'fallback';
-                    renderDashboard();
-                });
-        }
-
-        function showLoadingState() {
-            // Add loading shimmer to dynamic sections
-            var statusBar = document.getElementById('statusBar');
-            var loadingDiv = document.createElement('div');
-            loadingDiv.className = 'loading-shimmer';
-            loadingDiv.style.cssText = 'width: 100%; height: 28px; border-radius: 8px;';
-            statusBar.appendChild(loadingDiv);
-        }
-
-        function loadFromSharePoint() {
-            // Use Dashboard API when running externally (GitHub Pages)
-            if (spApi.shouldUseFlowProxy()) {
-                return spApi.getDashboardData().then(function(apiData) {
-                    // Map Dashboard API response to expected format
-                    var statusCounts = {
-                        complete: 0,
-                        onTrack: apiData.kpis.green || 0,
-                        atRisk: apiData.kpis.yellow || 0,
-                        blocked: apiData.kpis.critical || 0,
-                        notStarted: apiData.kpis.total - (apiData.kpis.green + apiData.kpis.yellow + apiData.kpis.critical)
-                    };
-
-                    // Map phases from API
-                    var phases = apiData.phases.map(function(p, idx) {
-                        return {
-                            num: idx + 1,
-                            name: p.name.replace('Phase ' + (idx + 1) + ': ', ''),
-                            pct: p.progress || 0,
-                            active: idx === 0 && p.progress < 100
-                        };
-                    });
-
-                    // Mark first incomplete phase as active
-                    var foundActive = false;
-                    phases.forEach(function(p) {
-                        if (!foundActive && p.pct < 100) {
-                            p.active = true;
-                            foundActive = true;
-                        } else if (p.pct < 100) {
-                            p.active = false;
-                        }
-                    });
-
-                    // Map pillars from API
-                    var pillars = apiData.pillars.map(function(p) {
-                        return {
-                            name: p.name,
-                            icon: getPillarIcon(p.name),
-                            tasks: p.tasks,
-                            revenue: p.revenue ? '$' + (p.revenue / 1000000).toFixed(1) + 'M' : null,
-                            color: getPillarColor(p.name)
-                        };
-                    });
-
-                    // Map milestones from API
-                    var milestones = apiData.milestones.map(function(m) {
-                        return {
-                            task: m.num,
-                            title: m.title,
-                            date: formatMilestoneDate(m.date),
-                            owner: m.owner,
-                            status: m.status.toLowerCase()
-                        };
-                    });
-
-                    return {
-                        statusCounts: statusCounts,
-                        phases: phases,
-                        pillars: pillars,
-                        milestones: milestones,
-                        totalTasks: apiData.kpis.total,
-                        lastModified: new Date(apiData.timestamp)
-                    };
-                });
-            }
-
-            // Direct SharePoint REST API (when running on SharePoint)
-            return spApi.getTasks({
-                select: 'Id,Title,Phase,Status,Priority,DueDate,Workstream',
-                top: 500
-            }).then(function(tasks) {
-                // Calculate status counts from live data
-                var statusCounts = {
-                    complete: 0,
-                    onTrack: 0,
-                    atRisk: 0,
-                    blocked: 0,
-                    notStarted: 0
-                };
-
-                var phaseCounts = {};
-                var phaseComplete = {};
-                var workstreamCounts = {};
-
-                tasks.forEach(function(task) {
-                    // Count by status
-                    var status = (task.Status || '').toLowerCase();
-                    if (status === 'complete' || status === 'completed') {
-                        statusCounts.complete++;
-                    } else if (status === 'on track' || status === 'in progress') {
-                        statusCounts.onTrack++;
-                    } else if (status === 'at risk') {
-                        statusCounts.atRisk++;
-                    } else if (status === 'blocked') {
-                        statusCounts.blocked++;
-                    } else {
-                        statusCounts.notStarted++;
-                    }
-
-                    // Count by phase
-                    var phase = task.Phase || 'Unknown';
-                    phaseCounts[phase] = (phaseCounts[phase] || 0) + 1;
-                    if (status === 'complete' || status === 'completed') {
-                        phaseComplete[phase] = (phaseComplete[phase] || 0) + 1;
-                    }
-
-                    // Count by workstream
-                    var ws = task.Workstream || 'Other';
-                    workstreamCounts[ws] = (workstreamCounts[ws] || 0) + 1;
-                });
-
-                // Build phases with calculated percentages
-                var phases = fallbackData.phases.map(function(p) {
-                    var phaseName = 'Phase ' + p.num;
-                    var total = phaseCounts[phaseName] || 0;
-                    var complete = phaseComplete[phaseName] || 0;
-                    var pct = total > 0 ? Math.round((complete / total) * 100) : 0;
-                    return Object.assign({}, p, { pct: pct, active: pct > 0 && pct < 100 });
-                });
-
-                // Mark first incomplete phase as active
-                var foundActive = false;
-                phases.forEach(function(p) {
-                    if (!foundActive && p.pct < 100) {
-                        p.active = true;
-                        foundActive = true;
-                    } else if (p.pct < 100) {
-                        p.active = false;
-                    }
-                });
-
-                return {
-                    statusCounts: statusCounts,
-                    phases: phases,
-                    pillars: fallbackData.pillars, // Keep static for now
-                    milestones: fallbackData.milestones, // Keep static for now
-                    totalTasks: tasks.length,
-                    lastModified: new Date()
-                };
-            });
-        }
-
-        // Helper functions for mapping API data
-        function getPillarIcon(name) {
-            var icons = {
-                'Product Expansion': 'box',
-                'CG GTM Synergy': 'handshake',
-                'Incremental Pipeline': 'chart-line',
-                'Lost Customer Conversion': 'users',
-                'Enablement': 'tools'
-            };
-            return icons[name] || 'folder';
-        }
-
-        function getPillarColor(name) {
-            var colors = {
-                'Product Expansion': '#3b82f6',
-                'CG GTM Synergy': '#8b5cf6',
-                'Incremental Pipeline': '#10b981',
-                'Lost Customer Conversion': '#f59e0b',
-                'Enablement': '#6b7280'
-            };
-            return colors[name] || '#6b7280';
-        }
-
-        function formatMilestoneDate(dateStr) {
-            if (!dateStr) return 'TBD';
-            var d = new Date(dateStr);
-            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            return months[d.getMonth()] + ' ' + d.getDate();
-        }
-
-        function renderDashboard() {
-            renderPhases();
-            renderStatusBar();
-            renderKeyMetrics();
-            renderPillars();
-            renderMilestones();
-            updateTimestamp();
-        }
-
-        function renderPhases() {
-            var container = document.getElementById('phaseTrack');
-            // Clear existing
-            while (container.firstChild) {
-                container.removeChild(container.firstChild);
-            }
-
-            dashboardData.phases.forEach(function(phase) {
-                var node = document.createElement('div');
-                node.className = 'phase-node' + (phase.active ? ' active' : '');
-
-                var markerWrap = document.createElement('div');
-                markerWrap.className = 'phase-marker-wrap';
-
-                var num = document.createElement('span');
-                num.className = 'phase-num';
-                num.textContent = phase.num;
-
-                var pct = document.createElement('span');
-                pct.className = 'phase-pct';
-                pct.textContent = phase.pct + '%';
-
-                markerWrap.appendChild(num);
-                markerWrap.appendChild(pct);
-
-                var label = document.createElement('div');
-                label.className = 'phase-label';
-                label.textContent = phase.name;
-
-                var range = document.createElement('div');
-                range.className = 'phase-range';
-                range.textContent = phase.range;
-
-                node.appendChild(markerWrap);
-                node.appendChild(label);
-                node.appendChild(range);
-                container.appendChild(node);
-            });
-        }
-
-        function renderStatusBar() {
-            var bar = document.getElementById('statusBar');
-            var legend = document.getElementById('statusLegend');
-
-            // Clear existing
-            while (bar.firstChild) { bar.removeChild(bar.firstChild); }
-            while (legend.firstChild) { legend.removeChild(legend.firstChild); }
-
-            var counts = dashboardData.statusCounts;
-            var total = counts.complete + counts.onTrack + counts.atRisk + counts.blocked + counts.notStarted;
-
-            var statuses = [
-                { key: 'complete', label: 'Complete', count: counts.complete, class: 'complete' },
-                { key: 'onTrack', label: 'On Track', count: counts.onTrack, class: 'on-track' },
-                { key: 'atRisk', label: 'At Risk', count: counts.atRisk, class: 'at-risk' },
-                { key: 'blocked', label: 'Blocked', count: counts.blocked, class: 'blocked' },
-                { key: 'notStarted', label: 'Not Started', count: counts.notStarted, class: 'not-started' }
-            ];
-
-            statuses.forEach(function(s) {
-                if (s.count > 0) {
-                    var pct = Math.round((s.count / total) * 100);
-                    var seg = document.createElement('div');
-                    seg.className = 'status-segment ' + s.class;
-                    seg.style.width = pct + '%';
-                    seg.textContent = s.count;
-                    bar.appendChild(seg);
-                }
-
-                // Legend item
-                var item = document.createElement('div');
-                item.className = 'status-legend-item';
-
-                var dot = document.createElement('div');
-                dot.className = 'status-dot ' + s.class;
-
-                var text = document.createElement('span');
-                text.className = 'status-legend-text';
-
-                var countSpan = document.createElement('span');
-                countSpan.className = 'status-legend-count';
-                countSpan.textContent = s.count;
-
-                text.appendChild(countSpan);
-                text.appendChild(document.createTextNode(' ' + s.label));
-
-                item.appendChild(dot);
-                item.appendChild(text);
-                legend.appendChild(item);
-            });
-        }
-
-        function renderKeyMetrics() {
-            var container = document.getElementById('keyMetrics');
-            while (container.firstChild) { container.removeChild(container.firstChild); }
-
-            var counts = dashboardData.statusCounts;
-            var total = counts.complete + counts.onTrack + counts.atRisk + counts.blocked + counts.notStarted;
-
-            var metrics = [
-                { label: 'Market Size', value: '525k tons' },
-                { label: 'ATL Shipments', value: '74.5k tons' },
-                { label: 'EBITDA Target', value: '21.5%' },
-                { label: 'Total Tasks', value: total.toString() },
-                { label: 'Critical Path', value: '51' }
-            ];
-
-            metrics.forEach(function(m) {
-                var row = document.createElement('div');
-                row.className = 'metric-row';
-
-                var label = document.createElement('span');
-                label.className = 'metric-label';
-                label.textContent = m.label;
-
-                var value = document.createElement('span');
-                value.className = 'metric-value';
-                value.textContent = m.value;
-
-                row.appendChild(label);
-                row.appendChild(value);
-                container.appendChild(row);
-            });
-        }
-
-        function renderPillars() {
-            var container = document.getElementById('pillarSection');
-            while (container.firstChild) { container.removeChild(container.firstChild); }
-
-            dashboardData.pillars.forEach(function(pillar) {
-                var card = document.createElement('div');
-                card.className = 'pillar-card ' + pillar.class;
-
-                var header = document.createElement('div');
-                header.className = 'pillar-header';
-
-                var name = document.createElement('div');
-                name.className = 'pillar-name';
-                name.textContent = pillar.name;
-
-                var potential = document.createElement('div');
-                potential.className = 'pillar-potential';
-                potential.textContent = pillar.potential;
-
-                header.appendChild(name);
-                header.appendChild(potential);
-
-                var how = document.createElement('div');
-                how.className = 'pillar-how';
-                how.textContent = pillar.how;
-
-                var stats = document.createElement('div');
-                stats.className = 'pillar-stats';
-
-                var statItems = [
-                    { value: pillar.budget, label: 'Budget', green: true },
-                    { value: pillar.tasks, label: 'Tasks', green: false },
-                    { value: pillar.critical, label: 'Critical', green: false }
-                ];
-
-                statItems.forEach(function(s) {
-                    var stat = document.createElement('div');
-                    stat.className = 'pillar-stat';
-
-                    var val = document.createElement('div');
-                    val.className = 'pillar-stat-value' + (s.green ? ' green' : '');
-                    val.textContent = s.value;
-
-                    var lbl = document.createElement('div');
-                    lbl.className = 'pillar-stat-label';
-                    lbl.textContent = s.label;
-
-                    stat.appendChild(val);
-                    stat.appendChild(lbl);
-                    stats.appendChild(stat);
-                });
-
-                card.appendChild(header);
-                card.appendChild(how);
-                card.appendChild(stats);
-                container.appendChild(card);
-            });
-        }
-
-        function renderMilestones() {
-            var container = document.getElementById('milestoneList');
-            while (container.firstChild) { container.removeChild(container.firstChild); }
-
-            dashboardData.milestones.forEach(function(m) {
-                var row = document.createElement('div');
-                row.className = 'milestone-row';
-
-                var date = document.createElement('span');
-                date.className = 'milestone-date';
-                date.textContent = m.date;
-
-                var text = document.createElement('span');
-                text.className = 'milestone-text';
-                text.textContent = m.text;
-
-                var status = document.createElement('span');
-                status.className = 'milestone-status' + (m.status ? ' ' + m.status : '');
-
-                row.appendChild(date);
-                row.appendChild(text);
-                row.appendChild(status);
-                container.appendChild(row);
-            });
-        }
-
-        function updateTimestamp() {
-            var el = document.getElementById('dataTimestamp');
-            var source = dataSource === 'sharepoint' ? 'Live' : 'Cached';
-            var time = spApi.formatDate(new Date(), true);
-            el.textContent = 'Data Updated: ' + time + ' (' + source + ')';
-        }
-    </script>
 </body>
 </html>
